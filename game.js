@@ -2,7 +2,63 @@
     LittleJS Hello World Starter Game
 */
 
-'use strict';
+class Ball extends EngineObject {
+  constructor(pos) {
+    super(pos, vec2(1), 0);
+
+    // make a bouncy ball
+    this.setCollision(1);
+    this.velocity = vec2(-1, -1).scale(0.2);
+    this.elasticity = 1;
+    this.damping = 0.8;
+  }
+
+  update() {
+    // if (this.pos.y < 0) {
+    //   // destroy ball if it goes below the level
+    //   ball = 0;
+    //   this.destroy();
+    // }
+
+    // // bounce on sides and top
+    // const nextPos = this.pos.x + this.velocity.x;
+    // if (
+    //   nextPos - this.size.x / 2 < 0 ||
+    //   nextPos + this.size.x / 2 > levelSize.x
+    // ) {
+    //   this.velocity.x *= -1;
+    //   this.bounce();
+    // }
+    // if (this.pos.y + this.velocity.y > levelSize.y) {
+    //   this.velocity.y *= -1;
+    //   this.bounce();
+    // }
+
+    // update physics
+    super.update();
+  }
+
+  collideWithObject(o) {
+    if (o == paddle && this.velocity.y < 0) {
+      // put english on the ball when it collides with paddle
+      this.velocity = this.velocity.rotate(0.2 * (this.pos.x - o.pos.x));
+      this.velocity.y = max(abs(this.velocity.y), 0.2);
+      this.bounce();
+      return 0;
+    }
+    return 1;
+  }
+
+  bounce() {
+    // speed up
+    const speed = min(1.1 * this.velocity.length(), 1);
+    this.velocity = this.velocity.normalize(speed);
+  }
+}
+
+("use strict");
+
+let ball, levelSize;
 
 // popup errors if there are any (help diagnose issues on mobile devices)
 //onerror = (...parameters)=> alert(parameters);
@@ -10,107 +66,54 @@
 // game variables
 let particleEmiter;
 
-// sound effects
-const sound_click = new Sound([.5,.5]);
-
 // medals
-const medal_example = new Medal(0, 'Example Medal', 'Medal description goes here.');
-medalsInit('Hello World');
 
 ///////////////////////////////////////////////////////////////////////////////
-function gameInit()
-{
-    // create tile collision and visible tile layer
-    initTileCollision(vec2(32, 16));
-    const tileLayer = new TileLayer(vec2(), tileCollisionSize);
-    const pos = vec2();
+function gameInit() {
+  // create tile collision and visible tile layer
+  canvasFixedSize = vec2(1280, 720);
+  levelSize = vec2(72, 40);
+}
 
-    // get level data from the tiles image
-    const imageLevelDataRow = 1;
-    mainContext.drawImage(tileImage, 0, 0);
-    for (pos.x = tileCollisionSize.x; pos.x--;)
-    for (pos.y = tileCollisionSize.y; pos.y--;)
-    {
-        const data = mainContext.getImageData(pos.x, 16*(imageLevelDataRow+1)-pos.y-1, 1, 1).data;
-        if (data[0])
-        {
-            setTileCollisionData(pos, 1);
-
-            const tileIndex = 1;
-            const direction = randInt(4)
-            const mirror = randInt(2);
-            const color = randColor();
-            const data = new TileLayerData(tileIndex, direction, mirror, color);
-            tileLayer.setData(pos, data);
-        }
+///////////////////////////////////////////////////////////////////////////////
+function gameUpdate() {
+  {
+    // spawn ball
+    if (!ball && (mouseWasPressed(0) || gamepadWasPressed(0))) {
+      ball = new Ball(vec2(1, 1));
+      ball.velocity.x = -1;
+      ball.velocity.y = -1;
+      console.log(ball);
     }
-    tileLayer.redraw();
-
-    // move camera to center of collision
-    cameraPos = tileCollisionSize.scale(.5);
-    cameraScale = 32;
-
-    // enable gravity
-    gravity = -.01;
-
-    // create particle emitter
-    const center = tileCollisionSize.scale(.5).add(vec2(0,9));
-    particleEmiter = new ParticleEmitter(
-        center, 0, 1, 0, 500, PI, // pos, angle, emitSize, emitTime, emitRate, emiteCone
-        0, vec2(16),                            // tileIndex, tileSize
-        new Color(1,1,1),   new Color(0,0,0),   // colorStartA, colorStartB
-        new Color(1,1,1,0), new Color(0,0,0,0), // colorEndA, colorEndB
-        2, .2, .2, .1, .05,     // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
-        .99, 1, 1, PI, .05,     // damping, angleDamping, gravityScale, particleCone, fadeRate, 
-        .5, 1, 1                // randomness, collide, additive, randomColorLinear, renderOrder
-    );
-    particleEmiter.elasticity = .3; // bounce when it collides
-    particleEmiter.trailScale = 2;  // stretch in direction of motion
+  }
+  if (keyWasPressed(37, 0)) {
+    ball.velocity.x -= 1;
+  }
+  if (keyWasPressed(39, 0)) {
+    ball.velocity.x += 1;
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-function gameUpdate()
-{
-    if (mouseWasPressed(0))
-    {
-        // play sound when mouse is pressed
-        sound_click.play(mousePos);
+function gameUpdatePost() {}
 
-        // change particle color and set to fade out
-        particleEmiter.colorStartA = new Color;
-        particleEmiter.colorStartB = randColor();
-        particleEmiter.colorEndA = particleEmiter.colorStartA.scale(1,0);
-        particleEmiter.colorEndB = particleEmiter.colorStartB.scale(1,0);
-
-        // unlock medals
-        medal_example.unlock();
-    }
-
-    // move particles to mouse location if on screen
-    if (mousePosScreen.x)
-        particleEmiter.pos = mousePos;
+///////////////////////////////////////////////////////////////////////////////
+function gameRender() {
+  // draw a grey square in the background without using webgl
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-function gameUpdatePost()
-{
-
-}
-
-///////////////////////////////////////////////////////////////////////////////
-function gameRender()
-{
-    // draw a grey square in the background without using webgl
-    drawRect(cameraPos, tileCollisionSize.add(vec2(5)), new Color(.2,.2,.2), 0, 0);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-function gameRenderPost()
-{
-    // draw to overlay canvas for hud rendering
-    drawTextScreen('Hello World', vec2(overlayCanvas.width/2, 80), 80, new Color, 9);
+function gameRenderPost() {
+  // draw to overlay canvas for hud rendering
+  drawTextScreen(
+    "Hello Boat",
+    vec2(overlayCanvas.width / 2, 80),
+    80,
+    new Color(),
+    9
+  );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Startup LittleJS Engine
-engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost, 'tiles.png');
+engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost);
