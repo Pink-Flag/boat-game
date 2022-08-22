@@ -4,55 +4,17 @@
 
 class Ball extends EngineObject {
   constructor(pos) {
-    super(pos, vec2(1), 0);
+    super(pos, vec2(1, 3), 0);
+    console.log(Ball);
 
     // make a bouncy ball
     this.setCollision(1);
     this.velocity = vec2(-1, -1).scale(0.2);
     this.elasticity = 1;
-    this.damping = 0.8;
-  }
-
-  update() {
-    // if (this.pos.y < 0) {
-    //   // destroy ball if it goes below the level
-    //   ball = 0;
-    //   this.destroy();
-    // }
-
-    // // bounce on sides and top
-    // const nextPos = this.pos.x + this.velocity.x;
-    // if (
-    //   nextPos - this.size.x / 2 < 0 ||
-    //   nextPos + this.size.x / 2 > levelSize.x
-    // ) {
-    //   this.velocity.x *= -1;
-    //   this.bounce();
-    // }
-    // if (this.pos.y + this.velocity.y > levelSize.y) {
-    //   this.velocity.y *= -1;
-    //   this.bounce();
-    // }
-
-    // update physics
-    super.update();
-  }
-
-  collideWithObject(o) {
-    if (o == paddle && this.velocity.y < 0) {
-      // put english on the ball when it collides with paddle
-      this.velocity = this.velocity.rotate(0.2 * (this.pos.x - o.pos.x));
-      this.velocity.y = max(abs(this.velocity.y), 0.2);
-      this.bounce();
-      return 0;
-    }
-    return 1;
-  }
-
-  bounce() {
-    // speed up
-    const speed = min(1.1 * this.velocity.length(), 1);
-    this.velocity = this.velocity.normalize(speed);
+    this.damping = 0.95;
+    this.angleVelocity = 0;
+    this.gravityScale = 1;
+    console.log(EngineObject);
   }
 }
 
@@ -78,19 +40,45 @@ function gameInit() {
 ///////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
   {
-    // spawn ball
     if (!ball && (mouseWasPressed(0) || gamepadWasPressed(0))) {
-      ball = new Ball(vec2(1, 1));
-      ball.velocity.x = -1;
-      ball.velocity.y = -1;
-      console.log(ball);
+      ball = new Ball();
+      // ball = vec2(1, 2);
+      console.log(ball.pos.length(), "length????");
+      // ball.velocity.x = -1;
+      // ball.velocity.y = -1;
     }
   }
   if (keyWasPressed(37, 0)) {
-    ball.velocity.x -= 1;
+    //left
+
+    ball.velocity.x -= 0.5;
+    // ball.pos.rotate(10);
+    // ball.angleVelocity -= 0.01;
+    console.log(ball);
+
+    console.log(ball.angle);
   }
   if (keyWasPressed(39, 0)) {
-    ball.velocity.x += 1;
+    //right
+    ball.velocity.x += 0.5;
+    // ball.pos.rotate(10);
+    console.log(ball.angle);
+
+    // ball.angleVelocity += 0.01;
+    console.log(ball);
+  }
+  if (keyWasPressed(40, 0)) {
+    //down
+    ball.velocity.y -= 0.5;
+  }
+  if (keyWasPressed(38, 0)) {
+    //up
+    ball.velocity.y += 0.5;
+    console.log(ball);
+  }
+  if (ball) {
+    // console.log(ball.pos, ball.pos.length());
+    console.log(ball.pos.normalize(ball.pos.length()));
   }
 }
 
