@@ -20,7 +20,7 @@ class Ball extends EngineObject {
 
 ("use strict");
 
-let ball, levelSize;
+let ball, levelSize, angle;
 
 // popup errors if there are any (help diagnose issues on mobile devices)
 //onerror = (...parameters)=> alert(parameters);
@@ -39,54 +39,37 @@ function gameInit() {
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
-  let xSpeed = 0;
-  let ySpeed = 0;
-  let speed = 0;
+  let speed = 0.3;
+  let friction = 0.96;
 
   if (!ball) {
     ball = new Ball();
-    // ball = vec2(1, 2);
-    // console.log(ball.pos.length(), "length????");
-    // ball.velocity.x = -1;
-    // ball.velocity.y = -1;
+
+    ball.velocity = vec2(1, 1);
   }
 
   if (keyWasPressed(37, 0)) {
     //left
-    xSpeed = -2;
-    ball.angle -= 0.785;
+
+    ball.angleVelocity -= 0.02;
   }
   if (keyWasPressed(39, 0)) {
     //right
-    xSpeed = 2;
-    ball.angle += 0.785;
+
+    ball.angleVelocity += 0.02;
   }
   if (keyWasPressed(40, 0)) {
     //down
-    ySpeed = -2;
   }
   if (keyWasPressed(38, 0)) {
     //up
-    ySpeed = 2;
-    speed = 0.5;
-    ball.applyForce(mousePos);
-  }
-  if (ball) {
-    // console.log("Hello or something");
-
-    // ball.angle = Math.atan2(mousePos.x, mousePos.y);
-    let angle = ball.angle;
-
-    if (angle < 0) {
-      angle += 2 * Math.PI;
-      console.log(angle, " <<<< in if");
-    } else {
-      console.log(angle);
-    }
-    // if (mouseWasPressed(0)) {
-    ball.pos.x = ball.pos.x + speed * Math.sin(angle);
-    ball.pos.y = ball.pos.y + speed * Math.cos(angle);
-    // }
+    console.log("up");
+    ball.velocity.x += Math.sin(ball.angle) * speed;
+    ball.velocity.y += Math.cos(ball.angle) * speed;
+    // ball.velocity.x;
+  } else {
+    ball.velocity.x *= friction;
+    ball.velocity.y *= friction;
   }
 }
 
@@ -102,7 +85,7 @@ function gameRender() {
 function gameRenderPost() {
   // draw to overlay canvas for hud rendering
   drawTextScreen(
-    "Good afternoon Boat",
+    ball.angle,
     vec2(overlayCanvas.width / 2, 80),
     80,
     new Color(),
