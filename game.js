@@ -41,7 +41,8 @@ function gameInit() {
 function gameUpdate() {
   let xSpeed = 0;
   let ySpeed = 0;
-  let speed = 1;
+  let speed = 0;
+
   if (!ball) {
     ball = new Ball();
     // ball = vec2(1, 2);
@@ -53,10 +54,12 @@ function gameUpdate() {
   if (keyWasPressed(37, 0)) {
     //left
     xSpeed = -2;
+    ball.angle -= 0.785;
   }
   if (keyWasPressed(39, 0)) {
     //right
     xSpeed = 2;
+    ball.angle += 0.785;
   }
   if (keyWasPressed(40, 0)) {
     //down
@@ -65,27 +68,25 @@ function gameUpdate() {
   if (keyWasPressed(38, 0)) {
     //up
     ySpeed = 2;
+    speed = 0.5;
+    ball.applyForce(mousePos);
   }
   if (ball) {
     // console.log("Hello or something");
 
-    ball.angle = Math.atan2(mousePos.x, mousePos.y);
-    let angle1 = Math.atan2(mousePos.y, mousePos.x);
-    console.log(mousePos.y, mousePos.x, "mouse");
-    let angle2 = Math.atan2(ball.pos.y, ball.pos.x);
-    // console.log(ball.pos.y, ball.pos.x, "ball");
-    let angle = angle2 - angle1;
-    // console.log(angle);
-    // ball.pos.add(xSpeed, ySpeed);
-    // ball.pos.x = mousePos.x - 10;
-    // ball.pos.y = mousePos.y - 10;
-    // console.log(ball.pos.distance(mousePos));
-    // console.log(ball.pos);
-    if (mouseIsDown(0)) {
-      // ball.applyAcceleration(1);
-      // ball.pos.x = ball.pos.x + speed * angle;
-      // ball.pos.y = ball.pos.y + speed * angle;
+    // ball.angle = Math.atan2(mousePos.x, mousePos.y);
+    let angle = ball.angle;
+
+    if (angle < 0) {
+      angle += 2 * Math.PI;
+      console.log(angle, " <<<< in if");
+    } else {
+      console.log(angle);
     }
+    // if (mouseWasPressed(0)) {
+    ball.pos.x = ball.pos.x + speed * Math.sin(angle);
+    ball.pos.y = ball.pos.y + speed * Math.cos(angle);
+    // }
   }
 }
 
