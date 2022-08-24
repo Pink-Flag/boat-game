@@ -39,46 +39,53 @@ function gameInit() {
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
-  {
-    if (!ball && (mouseWasPressed(0) || gamepadWasPressed(0))) {
-      ball = new Ball();
-      // ball = vec2(1, 2);
-      console.log(ball.pos.length(), "length????");
-      // ball.velocity.x = -1;
-      // ball.velocity.y = -1;
-    }
+  let xSpeed = 0;
+  let ySpeed = 0;
+  let speed = 1;
+  if (!ball) {
+    ball = new Ball();
+    // ball = vec2(1, 2);
+    // console.log(ball.pos.length(), "length????");
+    // ball.velocity.x = -1;
+    // ball.velocity.y = -1;
   }
+
   if (keyWasPressed(37, 0)) {
     //left
-
-    ball.velocity.x -= 0.5;
-    // ball.pos.rotate(10);
-    // ball.angleVelocity -= 0.01;
-    console.log(ball);
-
-    console.log(ball.angle);
+    xSpeed = -2;
   }
   if (keyWasPressed(39, 0)) {
     //right
-    ball.velocity.x += 0.5;
-    // ball.pos.rotate(10);
-    console.log(ball.angle);
-
-    // ball.angleVelocity += 0.01;
-    console.log(ball);
+    xSpeed = 2;
   }
   if (keyWasPressed(40, 0)) {
     //down
-    ball.velocity.y -= 0.5;
+    ySpeed = -2;
   }
   if (keyWasPressed(38, 0)) {
     //up
-    ball.velocity.y += 0.5;
-    console.log(ball);
+    ySpeed = 2;
   }
   if (ball) {
-    // console.log(ball.pos, ball.pos.length());
-    console.log(ball.pos.normalize(ball.pos.length()));
+    // console.log("Hello or something");
+
+    ball.angle = Math.atan2(mousePos.x, mousePos.y);
+    let angle1 = Math.atan2(mousePos.y, mousePos.x);
+    console.log(mousePos.y, mousePos.x, "mouse");
+    let angle2 = Math.atan2(ball.pos.y, ball.pos.x);
+    // console.log(ball.pos.y, ball.pos.x, "ball");
+    let angle = angle2 - angle1;
+    // console.log(angle);
+    // ball.pos.add(xSpeed, ySpeed);
+    // ball.pos.x = mousePos.x - 10;
+    // ball.pos.y = mousePos.y - 10;
+    // console.log(ball.pos.distance(mousePos));
+    // console.log(ball.pos);
+    if (mouseIsDown(0)) {
+      // ball.applyAcceleration(1);
+      // ball.pos.x = ball.pos.x + speed * angle;
+      // ball.pos.y = ball.pos.y + speed * angle;
+    }
   }
 }
 
