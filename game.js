@@ -94,7 +94,7 @@ function gameRender() {
 function gameRenderPost() {
   // draw to overlay canvas for hud rendering
   drawTextScreen(
-    "Hello Boat",
+    "Good afternoon Boat",
     vec2(overlayCanvas.width / 2, 80),
     80,
     new Color(),
