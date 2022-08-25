@@ -13,32 +13,26 @@ class Boat extends EngineObject {
   }
   update() {
     const nextPos = this.pos.x + this.velocity.x;
-    console.log(boat.velocity);
     if (
-      nextPos - this.size.x / 2 < 0 ||
-      nextPos + this.size.x / 2 > levelSize.x
+      nextPos - this.size.x / 2 < 1 ||
+      nextPos + this.size.x / 2 > levelSize.x - 1
     ) {
-      console.log("hitting x");
-
-      this.velocity.x *= -1;
-      // this.bounce();
+      this.velocity.x *= -0.25;
+      this.bounce();
     }
     if (
-      this.pos.y + this.velocity.y > levelSize.y ||
-      this.pos.y + this.velocity.y < 0
+      this.pos.y + this.velocity.y > levelSize.y - 1 ||
+      this.pos.y + this.velocity.y < 1
     ) {
-      this.velocity.y *= -1;
-      console.log("hitting y");
-      // this.bounce();
+      this.velocity.y *= -0.25;
+
+      this.bounce();
     }
     super.update();
   }
   bounce() {
-    // speed up
     const speed = min(1.1 * this.velocity.length(), 1);
     this.velocity = this.velocity.normalize(speed);
-
-    // scale bounce sound pitch by speed
   }
 }
 
