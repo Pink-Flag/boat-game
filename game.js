@@ -11,6 +11,31 @@ class Boat extends EngineObject {
     this.damping = 0.95;
     this.angleVelocity = 0;
   }
+  update() {
+    const nextPos = this.pos.x + this.velocity.x;
+    console.log(nextPos);
+    if (
+      nextPos - this.size.x / 2 < 0 ||
+      nextPos + this.size.x / 2 > levelSize.x
+    ) {
+      console.log("hitting x");
+      // this.velocity.x *= -1;
+      // this.bounce();
+    }
+    if (this.pos.y + this.velocity.y > levelSize.y) {
+      // this.velocity.y *= -1;
+      console.log("hitting y");
+      // this.bounce();
+    }
+    super.update();
+  }
+  bounce() {
+    // speed up
+    const speed = min(1.1 * this.velocity.length(), 1);
+    this.velocity = this.velocity.normalize(speed);
+
+    // scale bounce sound pitch by speed
+  }
 }
 
 ("use strict");
@@ -19,7 +44,7 @@ class Boat extends EngineObject {
 //onerror = (...parameters)=> alert(parameters);
 
 // game variables
-let boat, levelSize, angle;
+let boat, levelSize, angle, canvas;
 
 // medals
 
@@ -27,13 +52,13 @@ let boat, levelSize, angle;
 function gameInit() {
   // create tile collision and visible tile layer
   canvasFixedSize = vec2(1280, 720);
+
   levelSize = vec2(1280, 720);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
   let speed = 0.3;
-  let friction = 0.96;
 
   if (!boat) {
     boat = new Boat();
@@ -41,7 +66,6 @@ function gameUpdate() {
 
   if (keyWasPressed(37, 0)) {
     //left
-
     boat.angleVelocity -= 0.01;
   }
   if (keyWasPressed(39, 0)) {
@@ -60,6 +84,7 @@ function gameUpdate() {
     boat.velocity.x += Math.sin(boat.angle) * speed;
     boat.velocity.y += Math.cos(boat.angle) * speed;
   }
+  // boat.update();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
