@@ -13,17 +13,21 @@ class Boat extends EngineObject {
   }
   update() {
     const nextPos = this.pos.x + this.velocity.x;
-    console.log(nextPos);
+    console.log(boat.velocity);
     if (
       nextPos - this.size.x / 2 < 0 ||
       nextPos + this.size.x / 2 > levelSize.x
     ) {
       console.log("hitting x");
-      // this.velocity.x *= -1;
+
+      this.velocity.x *= -1;
       // this.bounce();
     }
-    if (this.pos.y + this.velocity.y > levelSize.y) {
-      // this.velocity.y *= -1;
+    if (
+      this.pos.y + this.velocity.y > levelSize.y ||
+      this.pos.y + this.velocity.y < 0
+    ) {
+      this.velocity.y *= -1;
       console.log("hitting y");
       // this.bounce();
     }
@@ -52,8 +56,8 @@ let boat, levelSize, angle, canvas;
 function gameInit() {
   // create tile collision and visible tile layer
   canvasFixedSize = vec2(1280, 720);
-
-  levelSize = vec2(1280, 720);
+  levelSize = vec2(72, 40);
+  cameraPos = levelSize.scale(0.5);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -61,7 +65,7 @@ function gameUpdate() {
   let speed = 0.3;
 
   if (!boat) {
-    boat = new Boat();
+    boat = new Boat(vec2(levelSize.x / 2, levelSize.y / 2 - 6));
   }
 
   if (keyWasPressed(37, 0)) {
@@ -84,7 +88,6 @@ function gameUpdate() {
     boat.velocity.x += Math.sin(boat.angle) * speed;
     boat.velocity.y += Math.cos(boat.angle) * speed;
   }
-  // boat.update();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
