@@ -36,13 +36,24 @@ class Boat extends EngineObject {
   }
 }
 
+class Enemy extends EngineObject {
+  constructor(pos, boatPos) {
+    super(pos, vec2(1), 0);
+    this.color = new Color(0.8, 0, 0);
+
+    // this.setCollision(1);
+
+    // this.damping = 0.95;
+    // this.angleVelocity = 0;
+  }
+}
 ("use strict");
 
 // popup errors if there are any (help diagnose issues on mobile devices)
 //onerror = (...parameters)=> alert(parameters);
 
 // game variables
-let boat, levelSize, angle, canvas;
+let boat, levelSize, angle, canvas, enemy, boatPos, attract;
 
 // medals
 
@@ -59,7 +70,7 @@ function gameUpdate() {
   let speed = 0.3;
 
   if (!boat) {
-    boat = new Boat(vec2(levelSize.x / 2, levelSize.y / 2 - 6));
+    boat = new Boat(vec2(10, levelSize.y / 2 - 6));
   }
 
   if (keyWasPressed(37, 0)) {
@@ -74,6 +85,12 @@ function gameUpdate() {
   if (keyWasPressed(40, 0)) {
     //down - not in use
   }
+  if (enemy) {
+    console.log(enemy.velocity);
+    let angleRad = Math.atan2(attract.x, attract.y);
+    enemy.velocity.x += Math.sin(angleRad) * 0.0005;
+    enemy.velocity.y += Math.cos(angleRad) * 0.0005;
+  }
   if (
     (keyWasPressed(37, 0) && keyIsDown(39, 0)) ||
     (keyWasPressed(39, 0) && keyIsDown(37, 0))
@@ -82,6 +99,12 @@ function gameUpdate() {
     boat.velocity.x += Math.sin(boat.angle) * speed;
     boat.velocity.y += Math.cos(boat.angle) * speed;
   }
+  boatPos = boat.pos;
+  if (!enemy) {
+    enemy = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2), boatPos);
+  }
+
+  attract = vec2(boatPos.x - enemy.pos.x, boatPos.y - enemy.pos.y);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
