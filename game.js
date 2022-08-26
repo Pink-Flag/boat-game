@@ -1,3 +1,6 @@
+// constricted ai
+//energy bar and power ups?
+
 class Boat extends EngineObject {
   constructor(pos) {
     super(pos, vec2(1, 3), 0);
@@ -5,15 +8,6 @@ class Boat extends EngineObject {
     this.angleVelocity = 0;
     this.setCollision(1, 1);
   }
-
-  // collideWithObject(o) {
-  //   // if (o === enemy) {
-  //   //   console.log("enemy caught me");
-  //   // }
-  //   if (o === obsticle) {
-  //     console.log("you die");
-  //   }
-  // }
   update() {
     const nextPos = this.pos.x + this.velocity.x;
     if (
@@ -80,12 +74,14 @@ class Enemy extends EngineObject {
     this.color = new Color(0.8, 0, 0);
     this.setCollision(1, 1);
   }
-  moveEnemy() {
-    let enemySpeed = Math.random() * (0.001 - 0.0002) + 0.0002;
+  moveEnemy(technicalArea) {
+    let enemySpeed = Math.random() * (0.002 - 0.0002) + 0.0002;
     let attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
     let angleRad = Math.atan2(attract.x, attract.y);
-    this.velocity.x += Math.sin(angleRad) * enemySpeed;
-    this.velocity.y += Math.cos(angleRad) * enemySpeed;
+    if (technicalArea) {
+      this.velocity.x += Math.sin(angleRad) * enemySpeed;
+      this.velocity.y += Math.cos(angleRad) * enemySpeed;
+    }
   }
 }
 
@@ -124,6 +120,7 @@ let boat,
   port,
   score = 0,
   speed = 0.3,
+  technicalArea,
   cargo = false;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -145,8 +142,11 @@ function gameUpdate() {
     enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2));
     enemy2 = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2));
   }
-  enemy.moveEnemy();
-  enemy2.moveEnemy();
+
+  enemy.moveEnemy(boatPos.x < (levelSize.x / 3) * 2);
+  
+  enemy2.moveEnemy(boatPos.x > levelSize.x / 3 );
+
   if (!obsticle) {
     obsticle = new Obsticle(vec2(levelSize.x - 50, levelSize.y / 2));
   }
