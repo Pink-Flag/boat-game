@@ -5,9 +5,10 @@ class Boat extends EngineObject {
     this.angleVelocity = 0;
     this.setCollision(1, 1);
   }
+
   collideWithObject(o) {
     if (o === enemy) {
-      console.log("it caught me");
+      // console.log("it caught me");
     }
   }
   update() {
@@ -51,19 +52,30 @@ class Boat extends EngineObject {
       (keyWasPressed(39, 0) && keyIsDown(37, 0))
     ) {
       //up
-      boat.velocity.x += Math.sin(boat.angle) * speed;
-      boat.velocity.y += Math.cos(boat.angle) * speed;
+      this.velocity.x += Math.sin(this.angle) * speed;
+      this.velocity.y += Math.cos(this.angle) * speed;
+    }
+  }
+  whirlpool(obsticlePos) {
+    console.log(this.velocity);
+    if (obsticlePos.distance(this.pos) < 5) {
+      let attract = vec2(
+        obsticlePos.x - this.pos.x,
+        obsticlePos.y - this.pos.y
+      );
+      let angleRad = Math.atan2(attract.x, attract.y);
+      this.velocity.x += Math.sin(angleRad) * 0.003;
+      this.velocity.y += Math.cos(angleRad) * 0.003;
     }
   }
 }
 
 class Enemy extends EngineObject {
-  constructor(pos, boatPos) {
+  constructor(pos) {
     super(pos, vec2(1), 0);
     this.color = new Color(0.8, 0, 0);
     this.setCollision(1, 1);
   }
-  // console.log(this)
   moveEnemy() {
     let enemySpeed = Math.random() * (0.001 - 0.0002) + 0.0002;
     let attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
@@ -72,10 +84,17 @@ class Enemy extends EngineObject {
     this.velocity.y += Math.cos(angleRad) * enemySpeed;
   }
 }
+
+class Obsticle extends EngineObject {
+  constructor(pos) {
+    super(pos, vec2(1), 0);
+    this.color = new Color(0.1, 0.9, 0.1);
+  }
+}
 ("use strict");
 
 // game variables
-let boat, levelSize, angle, canvas, enemy, boatPos, enemy2;
+let boat, levelSize, angle, canvas, enemy, boatPos, enemy2, obsticle;
 let speed = 0.3;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -94,13 +113,15 @@ function gameUpdate() {
   boatPos = boat.pos;
   boat.moveBoat();
   if (!enemy) {
-    enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2), boatPos);
-    enemy2 = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2), boatPos);
+    enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2));
+    enemy2 = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2));
   }
   enemy.moveEnemy();
-  console.log(enemy.velocity);
   enemy2.moveEnemy();
-  console.log(enemy2.velocity);
+  if (!obsticle) {
+    obsticle = new Obsticle(vec2(levelSize.x - 50, levelSize.y / 2));
+  }
+  boat.whirlpool(obsticle.pos);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -114,7 +135,13 @@ function gameRender() {
 ///////////////////////////////////////////////////////////////////////////////
 function gameRenderPost() {
   // draw to overlay canvas for hud rendering
-  drawTextScreen("boat", vec2(overlayCanvas.width / 2, 80), 80, new Color(), 9);
+  drawTextScreen(
+    "Death's boat",
+    vec2(overlayCanvas.width / 2, 80),
+    80,
+    new Color(),
+    9
+  );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
