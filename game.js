@@ -1,15 +1,14 @@
-/*
-    LittleJS Hello World Starter Game
-*/
-
 class Boat extends EngineObject {
   constructor(pos) {
     super(pos, vec2(1, 3), 0);
-
-    // this.setCollision(1);
-
     this.damping = 0.95;
     this.angleVelocity = 0;
+    this.setCollision(1, 1);
+  }
+  collideWithObject(o) {
+    if (o === enemy) {
+      console.log("it caught me");
+    }
   }
   update() {
     const nextPos = this.pos.x + this.velocity.x;
@@ -34,28 +33,50 @@ class Boat extends EngineObject {
     const speed = min(1.1 * this.velocity.length(), 1);
     this.velocity = this.velocity.normalize(speed);
   }
+  moveBoat() {
+    if (keyWasPressed(37, 0)) {
+      //left
+      this.angleVelocity -= 0.01;
+    }
+    if (keyWasPressed(39, 0)) {
+      //right
+
+      this.angleVelocity += 0.01;
+    }
+    if (keyWasPressed(40, 0)) {
+      //down - not in use
+    }
+    if (
+      (keyWasPressed(37, 0) && keyIsDown(39, 0)) ||
+      (keyWasPressed(39, 0) && keyIsDown(37, 0))
+    ) {
+      //up
+      boat.velocity.x += Math.sin(boat.angle) * speed;
+      boat.velocity.y += Math.cos(boat.angle) * speed;
+    }
+  }
 }
 
 class Enemy extends EngineObject {
   constructor(pos, boatPos) {
     super(pos, vec2(1), 0);
     this.color = new Color(0.8, 0, 0);
-
-    // this.setCollision(1);
-
-    // this.damping = 0.95;
-    // this.angleVelocity = 0;
+    this.setCollision(1, 1);
+  }
+  // console.log(this)
+  moveEnemy() {
+    let enemySpeed = Math.random() * (0.001 - 0.0002) + 0.0002;
+    let attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
+    let angleRad = Math.atan2(attract.x, attract.y);
+    this.velocity.x += Math.sin(angleRad) * enemySpeed;
+    this.velocity.y += Math.cos(angleRad) * enemySpeed;
   }
 }
 ("use strict");
 
-// popup errors if there are any (help diagnose issues on mobile devices)
-//onerror = (...parameters)=> alert(parameters);
-
 // game variables
-let boat, levelSize, angle, canvas, enemy, boatPos, attract;
-
-// medals
+let boat, levelSize, angle, canvas, enemy, boatPos, enemy2;
+let speed = 0.3;
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameInit() {
@@ -67,44 +88,19 @@ function gameInit() {
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
-  let speed = 0.3;
-
   if (!boat) {
     boat = new Boat(vec2(10, levelSize.y / 2 - 6));
   }
-
-  if (keyWasPressed(37, 0)) {
-    //left
-    boat.angleVelocity -= 0.01;
-  }
-  if (keyWasPressed(39, 0)) {
-    //right
-
-    boat.angleVelocity += 0.01;
-  }
-  if (keyWasPressed(40, 0)) {
-    //down - not in use
-  }
-  if (enemy) {
-    console.log(enemy.velocity);
-    let angleRad = Math.atan2(attract.x, attract.y);
-    enemy.velocity.x += Math.sin(angleRad) * 0.0005;
-    enemy.velocity.y += Math.cos(angleRad) * 0.0005;
-  }
-  if (
-    (keyWasPressed(37, 0) && keyIsDown(39, 0)) ||
-    (keyWasPressed(39, 0) && keyIsDown(37, 0))
-  ) {
-    //up
-    boat.velocity.x += Math.sin(boat.angle) * speed;
-    boat.velocity.y += Math.cos(boat.angle) * speed;
-  }
   boatPos = boat.pos;
+  boat.moveBoat();
   if (!enemy) {
-    enemy = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2), boatPos);
+    enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2), boatPos);
+    enemy2 = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2), boatPos);
   }
-
-  attract = vec2(boatPos.x - enemy.pos.x, boatPos.y - enemy.pos.y);
+  enemy.moveEnemy();
+  console.log(enemy.velocity);
+  enemy2.moveEnemy();
+  console.log(enemy2.velocity);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
