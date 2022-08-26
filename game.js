@@ -6,11 +6,14 @@ class Boat extends EngineObject {
     this.setCollision(1, 1);
   }
 
-  collideWithObject(o) {
-    if (o === enemy) {
-      // console.log("it caught me");
-    }
-  }
+  // collideWithObject(o) {
+  //   // if (o === enemy) {
+  //   //   console.log("enemy caught me");
+  //   // }
+  //   if (o === obsticle) {
+  //     console.log("you die");
+  //   }
+  // }
   update() {
     const nextPos = this.pos.x + this.velocity.x;
     if (
@@ -58,9 +61,8 @@ class Boat extends EngineObject {
   }
   whirlpool(obsticlePos) {
     let distance = obsticlePos.distance(this.pos);
-    let whirlSpeed = (10 - distance) / 1000;
-    console.log(whirlSpeed);
-    if (distance < 6) {
+    let whirlSpeed = (11 - distance) / 1000;
+    if (distance < 8) {
       let attract = vec2(
         obsticlePos.x - this.pos.x,
         obsticlePos.y - this.pos.y
@@ -91,13 +93,38 @@ class Obsticle extends EngineObject {
   constructor(pos) {
     super(pos, vec2(1), 0);
     this.color = new Color(0.1, 0.9, 0.1);
+    this.setCollision(0, 0);
+  }
+}
+class Soul extends EngineObject {
+  constructor(pos) {
+    super(pos, vec2(2, 2), 0);
+    this.color = new Color(0.9, 0.9, 0.1);
+  }
+}
+
+class Port extends EngineObject {
+  constructor(pos) {
+    super(pos, vec2(2, 4), 0);
+    this.color = new Color(0.9, 0.9, 0.1);
   }
 }
 ("use strict");
 
 // game variables
-let boat, levelSize, angle, canvas, enemy, boatPos, enemy2, obsticle;
-let speed = 0.3;
+let boat,
+  levelSize,
+  angle,
+  canvas,
+  enemy,
+  boatPos,
+  enemy2,
+  obsticle,
+  soul,
+  port,
+  score = 0,
+  speed = 0.3,
+  cargo = false;
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameInit() {
@@ -124,6 +151,30 @@ function gameUpdate() {
     obsticle = new Obsticle(vec2(levelSize.x - 50, levelSize.y / 2));
   }
   boat.whirlpool(obsticle.pos);
+
+  function createSoul() {
+    soul = new Soul(vec2(levelSize.x - 5, levelSize.y / 2));
+  }
+
+  if (!soul) {
+    createSoul();
+  }
+  if (!port) {
+    port = new Port(vec2(2, levelSize.y / 2));
+  }
+  if (isOverlapping(boatPos, vec2(1, 3), soul.pos, vec2(2, 2))) {
+    soul.destroy();
+    cargo = true;
+    boat.color = new Color(0.9, 0.9, 0.1);
+  }
+  if (isOverlapping(boatPos, vec2(1, 3), port.pos, vec2(2, 4))) {
+    if (cargo) {
+      boat.color = new Color(0.9, 0.9, 0.9);
+      score++;
+      createSoul();
+    }
+    cargo = false;
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -137,13 +188,7 @@ function gameRender() {
 ///////////////////////////////////////////////////////////////////////////////
 function gameRenderPost() {
   // draw to overlay canvas for hud rendering
-  drawTextScreen(
-    "Death's boat",
-    vec2(overlayCanvas.width / 2, 80),
-    80,
-    new Color(),
-    9
-  );
+  drawTextScreen(score, vec2(overlayCanvas.width / 2, 80), 80, new Color(), 9);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
