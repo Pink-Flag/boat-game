@@ -57,15 +57,17 @@ class Boat extends EngineObject {
     }
   }
   whirlpool(obsticlePos) {
-    console.log(this.velocity);
-    if (obsticlePos.distance(this.pos) < 5) {
+    let distance = obsticlePos.distance(this.pos);
+    let whirlSpeed = (10 - distance) / 1000;
+    console.log(whirlSpeed);
+    if (distance < 6) {
       let attract = vec2(
         obsticlePos.x - this.pos.x,
         obsticlePos.y - this.pos.y
       );
       let angleRad = Math.atan2(attract.x, attract.y);
-      this.velocity.x += Math.sin(angleRad) * 0.003;
-      this.velocity.y += Math.cos(angleRad) * 0.003;
+      this.velocity.x += Math.sin(angleRad) * whirlSpeed;
+      this.velocity.y += Math.cos(angleRad) * whirlSpeed;
     }
   }
 }
