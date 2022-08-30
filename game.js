@@ -1,10 +1,6 @@
-// constricted ai
 //energy bar and power ups?
 //particles to make water sparkle
 //foam trail behind boat, ripple
-// enemy still moves in slower velocity or holding pattern when boat is not in range
-// sinkhole movement
-// pickup in different places
 
 class Boat extends EngineObject {
   constructor(pos) {
@@ -82,12 +78,13 @@ class Boat extends EngineObject {
 }
 
 class Enemy extends EngineObject {
-  constructor(pos) {
+  constructor(pos, axis) {
     super(pos, vec2(1), 0);
     this.color = new Color(0.8, 0, 0);
     this.setCollision(1, 1);
     this.aim = -20;
-    this.axis = Math.floor(Math.random() * 2);
+    // this.axis = Math.floor(Math.random() * 2);
+    this.axis = axis;
   }
   enemySeek() {
     let enemySpeed = Math.random() * (0.004 - 0.0002) + 0.0002;
@@ -217,6 +214,12 @@ function energyCheck() {
   }
 }
 
+// class Shimmer extends Particle{
+//   constructor(pos, tileIndex, tileSize, angle) {
+//     super(pos, new Vector2, tileIndex, tileSize, angle)
+//   }
+// }
+
 ("use strict");
 
 // game variables
@@ -242,6 +245,34 @@ function gameInit() {
   canvasFixedSize = vec2(1280, 720);
   levelSize = vec2(72, 40);
   cameraPos = levelSize.scale(0.5);
+  // new ParticleEmitter(
+  //   vec2(36, 20), 0, vec2(72, 40), 0, 50,0,0);
+  new ParticleEmitter(
+    vec2(36, 20),
+    0,
+    vec2(72, 40),
+    0,
+    5,
+    PI, // pos, angle, emitSize, emitTime, emitRate, emiteCone
+    0,
+    vec2(16), // tileIndex, tileSize
+    new Color(1, 1, 1),
+    new Color(0, 0, 0), // colorStartA, colorStartB
+    new Color(1, 1, 1, 0),
+    new Color(0, 0, 0, 0), // colorEndA, colorEndB
+    2,
+    0.2,
+    0.2,
+    0,
+    0.05, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
+    0.99,
+    1,
+    1,
+    PI,
+    0.05, // damping, angleDamping, gravityScale, particleCone, fadeRate,
+    0.5,
+    1 // randomness, collide, additive, randomColorLinear, renderOrder
+  );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -253,8 +284,8 @@ function gameUpdate() {
   boatPos = boat.pos;
   boat.moveBoat();
   if (!enemy) {
-    enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2 + 10));
-    enemy2 = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2 - 15));
+    enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2 + 10), 0);
+    enemy2 = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2 - 15), 1);
   }
 
   if (enemy.pos.distance(enemy2.pos) > 10) {
@@ -272,7 +303,7 @@ function gameUpdate() {
   boat.whirlpool(obsticle.pos);
 
   function createSoul() {
-    soul = new Soul(vec2(levelSize.x - 5, levelSize.y / 2));
+    soul = new Soul(vec2(levelSize.x - 3, Math.random() * (35 - 5) + 5));
   }
 
   if (!soul) {
@@ -307,7 +338,7 @@ function gameUpdatePost() {}
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameRender() {
-  drawRect(cameraPos, levelSize, new Color(0, 0, 0.2), 0, 0);
+  drawRect(cameraPos, levelSize, new Color(0.31, 0.396, 0.651), 0, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
