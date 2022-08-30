@@ -5,9 +5,6 @@
 // enemy still moves in slower velocity or holding pattern when boat is not in range
 // sinkhole movement
 // pickup in different places
-// constraints on enemies around edges of game
-// stop enemies getting too close
-// enemy moves on x axis as well as y axis
 
 class Boat extends EngineObject {
   constructor(pos) {
@@ -90,6 +87,7 @@ class Enemy extends EngineObject {
     this.color = new Color(0.8, 0, 0);
     this.setCollision(1, 1);
     this.aim = -20;
+    this.axis = Math.floor(Math.random() * 2);
   }
   enemySeek() {
     let enemySpeed = Math.random() * (0.004 - 0.0002) + 0.0002;
@@ -99,9 +97,23 @@ class Enemy extends EngineObject {
     this.velocity.x += Math.sin(angleRad) * enemySpeed;
     this.velocity.y += Math.cos(angleRad) * enemySpeed;
   }
-  enemyHold() {
-    // put enemy in holding pattern
+  enemyHoldX() {
+    if (this.pos.x > 57) {
+      this.aim = -65;
+    }
+    if (this.pos.x < 15) {
+      this.aim = 65;
+    }
 
+    let enemySpeed = Math.random() * (0.004 - 0.0002) + 0.0002;
+    let attract = vec2(this.aim, 0);
+
+    let angleRad = Math.atan2(attract.x, attract.y);
+    // this.velocity.x += Math.sin(angleRad) * enemySpeed;
+    this.velocity.x += Math.sin(angleRad) * enemySpeed;
+  }
+
+  enemyHoldY() {
     if (this.pos.y > 32) {
       this.aim = -35;
     }
@@ -116,12 +128,18 @@ class Enemy extends EngineObject {
     // this.velocity.x += Math.sin(angleRad) * enemySpeed;
     this.velocity.y += Math.cos(angleRad) * enemySpeed;
   }
+
   moveEnemy() {
+    console.log(this.axis);
     let distance = boatPos.distance(this.pos);
     if (distance < 25) {
       this.enemySeek();
     } else {
-      this.enemyHold();
+      if (this.axis) {
+        this.enemyHoldX();
+      } else {
+        this.enemyHoldY();
+      }
     }
   }
   update() {
@@ -155,7 +173,6 @@ class Obstacle extends EngineObject {
     this.yrad = 5;
   }
   moveObstacle() {
-    console.log(this.pos);
     this.pos.x = this.xStart + this.xrad * Math.sin(this.t + Math.PI / 2);
     this.pos.y = this.yStart + this.yrad * Math.sin(2 * this.t);
     this.t += this.dt;
