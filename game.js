@@ -60,6 +60,7 @@ class Boat extends EngineObject {
       if (energy > 0) {
         energy -= 1;
       }
+      this.trail();
     }
   }
   whirlpool(obsticlePos) {
@@ -74,6 +75,39 @@ class Boat extends EngineObject {
       this.velocity.x += Math.sin(angleRad) * whirlSpeed;
       this.velocity.y += Math.cos(angleRad) * whirlSpeed;
     }
+  }
+
+  trail() {
+    let trailPos = vec2(
+      this.pos.x - this.velocity.x,
+      this.pos.y - this.velocity.y
+    );
+    new ParticleEmitter(
+      trailPos,
+      this.angleVelocity,
+      1,
+      0.5,
+      10,
+      PI, // pos, angle, emitSize, emitTime, emitRate, emiteCone
+      0,
+      vec2(16), // tileIndex, tileSize
+      new Color(1, 1, 1),
+      new Color(0, 0, 0), // colorStartA, colorStartB
+      new Color(1, 1, 1, 0),
+      new Color(0, 0, 0, 0), // colorEndA, colorEndB
+      2,
+      0.2,
+      0.2,
+      0.1,
+      this.angleVelocity, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
+      0.99,
+      1,
+      1,
+      PI,
+      0.05, // damping, angleDamping, gravityScale, particleCone, fadeRate,
+      0.5,
+      1 // randomness, collide, additive, randomColorLinear, renderOrder
+    );
   }
 }
 
@@ -127,7 +161,6 @@ class Enemy extends EngineObject {
   }
 
   moveEnemy() {
-    console.log(this.axis);
     let distance = boatPos.distance(this.pos);
     if (distance < 25) {
       this.enemySeek();
@@ -245,14 +278,12 @@ function gameInit() {
   canvasFixedSize = vec2(1280, 720);
   levelSize = vec2(72, 40);
   cameraPos = levelSize.scale(0.5);
-  // new ParticleEmitter(
-  //   vec2(36, 20), 0, vec2(72, 40), 0, 50,0,0);
   new ParticleEmitter(
     vec2(36, 20),
     0,
     vec2(72, 40),
     0,
-    5,
+    8,
     PI, // pos, angle, emitSize, emitTime, emitRate, emiteCone
     0,
     vec2(16), // tileIndex, tileSize
@@ -261,8 +292,8 @@ function gameInit() {
     new Color(1, 1, 1, 0),
     new Color(0, 0, 0, 0), // colorEndA, colorEndB
     2,
-    0.2,
-    0.2,
+    0.1,
+    0.1,
     0,
     0.05, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
     0.99,
@@ -283,6 +314,7 @@ function gameUpdate() {
 
   boatPos = boat.pos;
   boat.moveBoat();
+
   if (!enemy) {
     enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2 + 10), 0);
     enemy2 = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2 - 15), 1);
