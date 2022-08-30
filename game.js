@@ -1,5 +1,10 @@
 // constricted ai
 //energy bar and power ups?
+//particles to make water sparkle
+//foam trail behind boat, ripple
+// enemy still moves in slower velocity or holding pattern when boat is not in range
+// sinkhole movement
+// pickup in different places
 
 class Boat extends EngineObject {
   constructor(pos) {
@@ -121,14 +126,17 @@ function energyRegain() {
 }
 
 function energyCheck() {
-  if (energy > -40) {
+  if (energy >= 50) {
     speed = 0.3;
   }
-  if (energy < 40 && energy >= 20) {
+  if (energy < 50 && energy >= 25) {
     speed = 0.2;
   }
-  if (energy < 20) {
+  if (energy < 25) {
     speed = 0.1;
+  }
+  if (energy < 5) {
+    speed = 0.05;
   }
 }
 
@@ -162,9 +170,9 @@ function gameInit() {
 ///////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
   energyRegain();
-  if (!boat) {
-    boat = new Boat(vec2(10, levelSize.y / 2 - 6));
-  }
+
+  boat ||= new Boat(vec2(10, levelSize.y / 2 - 6));
+
   boatPos = boat.pos;
   boat.moveBoat();
   if (!enemy) {
@@ -176,9 +184,8 @@ function gameUpdate() {
 
   enemy2.moveEnemy(boatPos.x > levelSize.x / 3);
 
-  if (!obsticle) {
-    obsticle = new Obstacle(vec2(levelSize.x - 50, levelSize.y / 2));
-  }
+  obsticle ||= new Obstacle(vec2(levelSize.x - 50, levelSize.y / 2));
+
   boat.whirlpool(obsticle.pos);
 
   function createSoul() {
