@@ -5,6 +5,9 @@
 // enemy still moves in slower velocity or holding pattern when boat is not in range
 // sinkhole movement
 // pickup in different places
+// constraints on enemies around edges of game
+// stop enemies getting too close
+// enemy moves on x axis as well as y axis
 
 class Boat extends EngineObject {
   constructor(pos) {
@@ -121,6 +124,22 @@ class Enemy extends EngineObject {
       this.enemyHold();
     }
   }
+  update() {
+    const nextPos = this.pos.x + this.velocity.x;
+    if (
+      nextPos - this.size.x / 2 < 1 ||
+      nextPos + this.size.x / 2 > levelSize.x - 1
+    ) {
+      this.velocity.x *= -0.25;
+    }
+    if (
+      this.pos.y + this.velocity.y > levelSize.y - 1 ||
+      this.pos.y + this.velocity.y < 1
+    ) {
+      this.velocity.y *= -0.25;
+    }
+    super.update();
+  }
 }
 
 class Obstacle extends EngineObject {
@@ -221,8 +240,9 @@ function gameUpdate() {
     enemy2 = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2 - 15));
   }
 
-  enemy.moveEnemy();
-
+  if (enemy.pos.distance(enemy2.pos) > 10) {
+    enemy.moveEnemy();
+  }
   enemy2.moveEnemy();
 
   // obsticle ||= new Obstacle(vec2(levelSize.x - 50, levelSize.y / 2));
