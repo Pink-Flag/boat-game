@@ -55,22 +55,15 @@ class Boat extends EngineObject {
       (keyWasPressed(39, 0) && keyIsDown(37, 0))
     ) {
       //up
-      this.boatSpeed();
       this.velocity.x += Math.sin(this.angle) * speed;
       this.velocity.y += Math.cos(this.angle) * speed;
       moveSpeed = this.velocity.x + this.velocity.y;
- 
+
       if (energy > 0) {
         energy -= 1;
       }
-      this.trail(10);
+      this.trail(Math.floor(Math.abs(moveSpeed * 100)));
     }
-  }
-
-  boatSpeed() {
-    let magnitude = Math.sqrt(
-      Math.pow(this.pos.x, 2) + Math.pow(this.pos.y, 2)
-    );
   }
 
   whirlpool(obsticlePos) {
@@ -327,8 +320,7 @@ function gameUpdate() {
 
   boatPos = boat.pos;
   boat.moveBoat();
-  boat.boatSpeed();
-  console.log(moveSpeed);
+  console.log(Math.abs(moveSpeed));
   if (!enemy) {
     enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2 + 10), 0);
     enemy2 = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2 - 15), 1);
