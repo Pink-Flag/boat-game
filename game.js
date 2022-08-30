@@ -1,3 +1,11 @@
+// constricted ai
+//energy bar and power ups?
+//particles to make water sparkle
+//foam trail behind boat, ripple
+// enemy still moves in slower velocity or holding pattern when boat is not in range
+// sinkhole movement
+// pickup in different places
+
 class Boat extends EngineObject {
   constructor(pos) {
     super(pos, vec2(1, 3), 0);
@@ -5,15 +13,6 @@ class Boat extends EngineObject {
     this.angleVelocity = 0;
     this.setCollision(1, 1);
   }
-
-  // collideWithObject(o) {
-  //   // if (o === enemy) {
-  //   //   console.log("enemy caught me");
-  //   // }
-  //   if (o === obsticle) {
-  //     console.log("you die");
-  //   }
-  // }
   update() {
     const nextPos = this.pos.x + this.velocity.x;
     if (
@@ -41,11 +40,16 @@ class Boat extends EngineObject {
     if (keyWasPressed(37, 0)) {
       //left
       this.angleVelocity -= 0.01;
+      if (energy > 0) {
+        energy -= 0.5;
+      }
     }
     if (keyWasPressed(39, 0)) {
       //right
-
       this.angleVelocity += 0.01;
+      if (energy > 0) {
+        energy -= 0.5;
+      }
     }
     if (keyWasPressed(40, 0)) {
       //down - not in use
@@ -57,6 +61,9 @@ class Boat extends EngineObject {
       //up
       this.velocity.x += Math.sin(this.angle) * speed;
       this.velocity.y += Math.cos(this.angle) * speed;
+      if (energy > 0) {
+        energy -= 1;
+      }
     }
   }
   whirlpool(obsticlePos) {
@@ -80,16 +87,18 @@ class Enemy extends EngineObject {
     this.color = new Color(0.8, 0, 0);
     this.setCollision(1, 1);
   }
-  moveEnemy() {
-    let enemySpeed = Math.random() * (0.001 - 0.0002) + 0.0002;
+  moveEnemy(technicalArea) {
+    let enemySpeed = Math.random() * (0.004 - 0.0002) + 0.0002;
     let attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
     let angleRad = Math.atan2(attract.x, attract.y);
-    this.velocity.x += Math.sin(angleRad) * enemySpeed;
-    this.velocity.y += Math.cos(angleRad) * enemySpeed;
+    if (technicalArea) {
+      this.velocity.x += Math.sin(angleRad) * enemySpeed;
+      this.velocity.y += Math.cos(angleRad) * enemySpeed;
+    }
   }
 }
 
-class Obsticle extends EngineObject {
+class Obstacle extends EngineObject {
   constructor(pos) {
     super(pos, vec2(1), 0);
     this.color = new Color(0.1, 0.9, 0.1);
@@ -109,6 +118,28 @@ class Port extends EngineObject {
     this.color = new Color(0.9, 0.9, 0.1);
   }
 }
+
+function energyRegain() {
+  if (energy < 100) {
+    energy += 0.05;
+  }
+}
+
+function energyCheck() {
+  if (energy >= 50) {
+    speed = 0.3;
+  }
+  if (energy < 50 && energy >= 25) {
+    speed = 0.2;
+  }
+  if (energy < 25) {
+    speed = 0.1;
+  }
+  if (energy < 5) {
+    speed = 0.05;
+  }
+}
+
 ("use strict");
 
 // game variables
@@ -121,9 +152,11 @@ let boat,
   enemy2,
   obsticle,
   soul,
+  energy = 100,
   port,
   score = 0,
   speed = 0.3,
+  technicalArea,
   cargo = false;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -136,20 +169,23 @@ function gameInit() {
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
-  if (!boat) {
-    boat = new Boat(vec2(10, levelSize.y / 2 - 6));
-  }
+  energyRegain();
+
+  boat ||= new Boat(vec2(10, levelSize.y / 2 - 6));
+
   boatPos = boat.pos;
   boat.moveBoat();
   if (!enemy) {
-    enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2));
-    enemy2 = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2));
+    enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2 + 10));
+    enemy2 = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2 - 15));
   }
-  enemy.moveEnemy();
-  enemy2.moveEnemy();
-  if (!obsticle) {
-    obsticle = new Obsticle(vec2(levelSize.x - 50, levelSize.y / 2));
-  }
+
+  enemy.moveEnemy(boatPos.x < (levelSize.x / 3) * 2);
+
+  enemy2.moveEnemy(boatPos.x > levelSize.x / 3);
+
+  obsticle ||= new Obstacle(vec2(levelSize.x - 50, levelSize.y / 2));
+
   boat.whirlpool(obsticle.pos);
 
   function createSoul() {
@@ -170,11 +206,17 @@ function gameUpdate() {
   if (isOverlapping(boatPos, vec2(1, 3), port.pos, vec2(2, 4))) {
     if (cargo) {
       boat.color = new Color(0.9, 0.9, 0.9);
+      if (energy < 80) {
+        energy += 20;
+      } else {
+        energy = 100;
+      }
       score++;
       createSoul();
     }
     cargo = false;
   }
+  energyCheck();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -189,6 +231,8 @@ function gameRender() {
 function gameRenderPost() {
   // draw to overlay canvas for hud rendering
   drawTextScreen(score, vec2(overlayCanvas.width / 2, 80), 80, new Color(), 9);
+  let energybar = vec2(energy / 6, 1);
+  drawRect(vec2(50 + energy / 12, 38), energybar, new Color(0, 1, 0.5), 0, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
