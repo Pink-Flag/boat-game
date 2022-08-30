@@ -86,14 +86,39 @@ class Enemy extends EngineObject {
     super(pos, vec2(1), 0);
     this.color = new Color(0.8, 0, 0);
     this.setCollision(1, 1);
+    this.aim = -20;
   }
-  moveEnemy(technicalArea) {
+  enemySeek() {
     let enemySpeed = Math.random() * (0.004 - 0.0002) + 0.0002;
+
     let attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
     let angleRad = Math.atan2(attract.x, attract.y);
-    if (technicalArea) {
-      this.velocity.x += Math.sin(angleRad) * enemySpeed;
-      this.velocity.y += Math.cos(angleRad) * enemySpeed;
+    this.velocity.x += Math.sin(angleRad) * enemySpeed;
+    this.velocity.y += Math.cos(angleRad) * enemySpeed;
+  }
+  enemyHold() {
+    // put enemy in holding pattern
+
+    if (this.pos.y > 32) {
+      this.aim = -35;
+    }
+    if (this.pos.y < 8) {
+      this.aim = 35;
+    }
+
+    let enemySpeed = Math.random() * (0.004 - 0.0002) + 0.0002;
+    let attract = vec2(boatPos.x - this.pos.x, this.aim);
+
+    let angleRad = Math.atan2(attract.x, attract.y);
+    // this.velocity.x += Math.sin(angleRad) * enemySpeed;
+    this.velocity.y += Math.cos(angleRad) * enemySpeed;
+  }
+  moveEnemy() {
+    let distance = boatPos.distance(this.pos);
+    if (distance < 25) {
+      this.enemySeek();
+    } else {
+      this.enemyHold();
     }
   }
 }
@@ -103,8 +128,24 @@ class Obstacle extends EngineObject {
     super(pos, vec2(1), 0);
     this.color = new Color(0.1, 0.9, 0.1);
     this.setCollision(0, 0);
+    this.xStart = this.pos.x;
+    this.yStart = this.pos.y;
+    this.t = 0;
+    this.dt = Math.PI / 1000;
+    this.xrad = 10;
+    this.yrad = 5;
+  }
+  moveObstacle() {
+    console.log(this.pos);
+    this.pos.x = this.xStart + this.xrad * Math.sin(this.t + Math.PI / 2);
+    this.pos.y = this.yStart + this.yrad * Math.sin(2 * this.t);
+    this.t += this.dt;
+    if (this.t >= 2 * Math.PI) {
+      this.t -= 2 * Math.PI;
+    }
   }
 }
+
 class Soul extends EngineObject {
   constructor(pos) {
     super(pos, vec2(2, 2), 0);
@@ -180,11 +221,16 @@ function gameUpdate() {
     enemy2 = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2 - 15));
   }
 
-  enemy.moveEnemy(boatPos.x < (levelSize.x / 3) * 2);
+  enemy.moveEnemy();
 
-  enemy2.moveEnemy(boatPos.x > levelSize.x / 3);
+  enemy2.moveEnemy();
 
-  obsticle ||= new Obstacle(vec2(levelSize.x - 50, levelSize.y / 2));
+  // obsticle ||= new Obstacle(vec2(levelSize.x - 50, levelSize.y / 2));
+  obsticle ||= new Obstacle(
+    vec2(Math.random() * (50 - 20) + 10, Math.random() * (30 - 10) + 10)
+  );
+
+  obsticle.moveObstacle();
 
   boat.whirlpool(obsticle.pos);
 
