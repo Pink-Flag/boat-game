@@ -104,8 +104,8 @@ class Boat extends EngineObject {
       new Color(1, 1, 1, 0),
       new Color(0, 0, 0, 0), // colorEndA, colorEndB
       2,
-      0.2,
-      0.2,
+      0.07,
+      0.07,
       0.1,
       this.angleVelocity, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
       0.99,
@@ -184,6 +184,42 @@ class Enemy extends EngineObject {
         this.enemyHoldY();
       }
     }
+  }
+  trail(numOfParticles) {
+    let trailPos = vec2(
+      this.pos.x - this.velocity.x,
+      this.pos.y - this.velocity.y
+    );
+    let emitter = new ParticleEmitter(
+      trailPos,
+      this.angleVelocity,
+      1,
+      0.5,
+      numOfParticles,
+      1, // pos, angle, emitSize, emitTime, emitRate, emiteCone
+      -1,
+      vec2(16), // tileIndex, tileSize
+      new Color(1, 1, 1),
+      new Color(0, 0, 0), // colorStartA, colorStartB
+      new Color(1, 1, 1, 0),
+      new Color(0, 0, 0, 0), // colorEndA, colorEndB
+      2,
+      0.07,
+      0.07,
+      0.1,
+      this.angleVelocity, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
+      0.99,
+      1,
+      1,
+      PI,
+      0.05, // damping, angleDamping, gravityScale, particleCone, fadeRate,
+      0.1,
+      1 // randomness, collide, additive, randomColorLinear, renderOrder
+    );
+
+    emitter.mass = 1;
+    emitter.elasticity = 0.5;
+    emitter.setCollision(0, 1);
   }
   update() {
     const nextPos = this.pos.x + this.velocity.x;
@@ -301,7 +337,7 @@ function gameInit() {
     0,
     8,
     PI, // pos, angle, emitSize, emitTime, emitRate, emiteCone
-    0,
+    -1,
     vec2(16), // tileIndex, tileSize
     new Color(1, 1, 1),
     new Color(0, 0, 0), // colorStartA, colorStartB
@@ -345,8 +381,10 @@ function gameUpdate() {
 
   if (enemy.pos.distance(enemy2.pos) > 10) {
     enemy.moveEnemy();
+    enemy.trail(5);
   }
   enemy2.moveEnemy();
+  enemy2.trail(5);
   enemy.tileIndex = -1;
   enemy2.tileIndex = -1;
 
@@ -392,8 +430,8 @@ function gameUpdate() {
   }
   energyCheck();
   boat.tileIndex = 0;
-  if (moveSpeed > 0.4) {
-    boat.trail(moveSpeed / 10);
+  if (moveSpeed > 0.8) {
+    boat.trail(moveSpeed);
   }
 }
 
