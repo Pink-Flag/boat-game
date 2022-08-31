@@ -422,16 +422,14 @@ function gameUpdate() {
 
   // obsticle ||= new Obstacle(vec2(levelSize.x - 50, levelSize.y / 2));
   obsticle ||= new Obstacle(
-    vec2(Math.random() * (50 - 20) + 10, Math.random() * (30 - 10) + 10)
+    vec2(Math.random() * 30 + 15, Math.random() * 10 + 15)
   );
+  console.log(obsticle.pos.y);
 
   obsticle.moveObstacle();
   obsticle.tileIndex = -1;
-  // obsticle.whirl();
   console.log(obsticle.angle);
-  // obsticle.angleVelocity = 0.5;
-
-  boat.whirlpool(obsticle.pos);
+   boat.whirlpool(obsticle.pos);
 
   function createSoul() {
     soul = new Soul(vec2(levelSize.x - 3, Math.random() * (35 - 5) + 5));
