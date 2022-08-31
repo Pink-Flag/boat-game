@@ -120,23 +120,25 @@ class Boat extends EngineObject {
     emitter.mass = 1;
     emitter.elasticity = 0.5;
     emitter.setCollision(0, 1);
-    console.log(emitter);
   }
 }
 
 class Enemy extends EngineObject {
   constructor(pos, axis) {
-    super(pos, vec2(1), 0);
+    super(pos, vec2(3, 3), 0);
     this.color = new Color(0.8, 0, 0);
     this.setCollision(1, 1);
     this.aim = -20;
     this.axis = axis;
+    this.tileSize = vec2(64);
+    this.tileIndex = 0;
     this.renderOrder = 2;
   }
   enemySeek() {
     let enemySpeed = Math.random() * (0.004 - 0.0002) + 0.0002;
 
     let attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
+    this.angle = Math.atan2(attract.x, attract.y);
     let angleRad = Math.atan2(attract.x, attract.y);
     this.velocity.x += Math.sin(angleRad) * enemySpeed;
     this.velocity.y += Math.cos(angleRad) * enemySpeed;
@@ -151,9 +153,8 @@ class Enemy extends EngineObject {
 
     let enemySpeed = Math.random() * (0.004 - 0.0002) + 0.0002;
     let attract = vec2(this.aim, 0);
-
+    this.angle = Math.atan2(attract.x, attract.y);
     let angleRad = Math.atan2(attract.x, attract.y);
-    // this.velocity.x += Math.sin(angleRad) * enemySpeed;
     this.velocity.x += Math.sin(angleRad) * enemySpeed;
   }
 
@@ -174,6 +175,7 @@ class Enemy extends EngineObject {
   }
 
   moveEnemy() {
+    console.log(enemy.angle);
     let distance = boatPos.distance(this.pos);
     if (distance < 25) {
       this.enemySeek();
@@ -381,12 +383,10 @@ function gameUpdate() {
 
   if (enemy.pos.distance(enemy2.pos) > 10) {
     enemy.moveEnemy();
-    enemy.trail(5);
+    enemy.trail(3);
   }
   enemy2.moveEnemy();
-  enemy2.trail(5);
-  enemy.tileIndex = -1;
-  enemy2.tileIndex = -1;
+  enemy2.trail(3);
 
   // obsticle ||= new Obstacle(vec2(levelSize.x - 50, levelSize.y / 2));
   obsticle ||= new Obstacle(
