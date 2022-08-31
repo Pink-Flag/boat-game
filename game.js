@@ -4,11 +4,11 @@
 
 class Boat extends EngineObject {
   constructor(pos) {
-    super(pos, vec2(2, 3), 0);
+    super(pos, vec2(1.6, 3), 0);
     this.damping = 0.95;
     this.angleVelocity = 0;
     this.setCollision(1, 1);
-    this.tileSize = vec2(30, 47);
+    this.tileSize = vec2(23, 45);
     this.renderOrder = 2;
   }
   update() {
@@ -125,12 +125,12 @@ class Boat extends EngineObject {
 
 class Enemy extends EngineObject {
   constructor(pos, axis) {
-    super(pos, vec2(2, 3), 0);
+    super(pos, vec2(1.6, 3), 0);
     this.color = new Color(0.8, 0, 0);
     this.setCollision(1, 1);
     this.aim = -20;
     this.axis = axis;
-    this.tileSize = vec2(30, 47);
+    this.tileSize = vec2(23, 45);
     this.tileIndex = 0;
     this.renderOrder = 2;
   }
