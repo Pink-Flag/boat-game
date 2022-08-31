@@ -4,11 +4,11 @@
 
 class Boat extends EngineObject {
   constructor(pos) {
-    super(pos, vec2(3, 3), 0);
+    super(pos, vec2(2, 3), 0);
     this.damping = 0.95;
     this.angleVelocity = 0;
     this.setCollision(1, 1);
-    this.tileSize = vec2(64, 64);
+    this.tileSize = vec2(30, 47);
     this.renderOrder = 2;
   }
   update() {
@@ -125,12 +125,12 @@ class Boat extends EngineObject {
 
 class Enemy extends EngineObject {
   constructor(pos, axis) {
-    super(pos, vec2(3, 3), 0);
+    super(pos, vec2(2, 3), 0);
     this.color = new Color(0.8, 0, 0);
     this.setCollision(1, 1);
     this.aim = -20;
     this.axis = axis;
-    this.tileSize = vec2(64);
+    this.tileSize = vec2(30, 47);
     this.tileIndex = 0;
     this.renderOrder = 2;
   }
@@ -168,9 +168,8 @@ class Enemy extends EngineObject {
 
     let enemySpeed = Math.random() * (0.004 - 0.0002) + 0.0002;
     let attract = vec2(boatPos.x - this.pos.x, this.aim);
-
+    this.angle = Math.atan2(attract.x, attract.y);
     let angleRad = Math.atan2(attract.x, attract.y);
-    // this.velocity.x += Math.sin(angleRad) * enemySpeed;
     this.velocity.y += Math.cos(angleRad) * enemySpeed;
   }
 
@@ -252,6 +251,7 @@ class Obstacle extends EngineObject {
     this.dt = Math.PI / 1000;
     this.xrad = 15;
     this.yrad = 10;
+    this.renderOrder = 2;
   }
   moveObstacle() {
     this.pos.x = this.xStart + this.xrad * Math.sin(this.t + Math.PI / 2);
@@ -267,6 +267,7 @@ class Soul extends EngineObject {
   constructor(pos) {
     super(pos, vec2(2, 2), 0);
     this.color = new Color(0.9, 0.9, 0.1);
+    this.renderOrder = 2;
   }
 }
 
@@ -274,6 +275,7 @@ class Port extends EngineObject {
   constructor(pos) {
     super(pos, vec2(2, 4), 0);
     this.color = new Color(0.9, 0.9, 0.1);
+    this.renderOrder = 1;
   }
 }
 
