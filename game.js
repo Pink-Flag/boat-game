@@ -65,7 +65,8 @@ class Boat extends EngineObject {
   }
 
   calculateMoveSpeed() {
-    moveSpeed = Math.floor(Math.abs(this.velocity.x + this.velocity.y * 100));
+    moveSpeed =
+      Math.round(Math.abs(this.velocity.x + this.velocity.y * 100) * 10) / 10;
   }
 
   whirlpool(obsticlePos) {
@@ -110,9 +111,7 @@ class Boat extends EngineObject {
       1,
       PI,
       0.05, // damping, angleDamping, gravityScale, particleCone, fadeRate,
-      0.5,
-      1,
-      0,
+      0.1,
       1 // randomness, collide, additive, randomColorLinear, renderOrder
     );
 
@@ -210,8 +209,8 @@ class Obstacle extends EngineObject {
     this.yStart = this.pos.y;
     this.t = 0;
     this.dt = Math.PI / 1000;
-    this.xrad = 10;
-    this.yrad = 5;
+    this.xrad = 15;
+    this.yrad = 10;
   }
   moveObstacle() {
     this.pos.x = this.xStart + this.xrad * Math.sin(this.t + Math.PI / 2);
@@ -359,7 +358,7 @@ function gameUpdate() {
   boatPos = boat.pos;
   boat.moveBoat();
   boat.calculateMoveSpeed();
-  if (moveSpeed > 0) {
+  if (moveSpeed > 0.4) {
     boat.trail(moveSpeed / 10);
   }
   if (!enemy) {
