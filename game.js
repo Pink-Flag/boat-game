@@ -41,6 +41,7 @@ class Boat extends EngineObject {
       if (energy > 0) {
         energy -= 0.5;
       }
+      this.trail(50, 5);
     }
     if (keyWasPressed(39, 0)) {
       //right
@@ -48,6 +49,7 @@ class Boat extends EngineObject {
       if (energy > 0) {
         energy -= 0.5;
       }
+      this.trail(50, 5);
     }
     if (keyWasPressed(40, 0)) {
       //down - not in use
@@ -85,7 +87,7 @@ class Boat extends EngineObject {
     }
   }
 
-  trail(numOfParticles) {
+  trail(numOfParticles, cone = 0.6) {
     let trailPos = vec2(
       this.pos.x - this.velocity.x,
       this.pos.y - this.velocity.y
@@ -96,7 +98,7 @@ class Boat extends EngineObject {
       1,
       0.5,
       numOfParticles,
-      1, // pos, angle, emitSize, emitTime, emitRate, emiteCone
+      cone, // pos, angle, emitSize, emitTime, emitRate, emiteCone
       -1,
       vec2(16), // tileIndex, tileSize
       new Color(1, 1, 1),
@@ -106,12 +108,12 @@ class Boat extends EngineObject {
       2,
       0.07,
       0.07,
-      0.1,
+      0.05,
       this.angleVelocity, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
       0.99,
       1,
       1,
-      PI,
+      Math.PI,
       0.05, // damping, angleDamping, gravityScale, particleCone, fadeRate,
       0.1,
       1 // randomness, collide, additive, randomColorLinear, renderOrder
@@ -167,14 +169,13 @@ class Enemy extends EngineObject {
     }
 
     let enemySpeed = Math.random() * (0.004 - 0.0002) + 0.0002;
-    let attract = vec2(boatPos.x - this.pos.x, this.aim);
+    let attract = vec2(0, this.aim);
     this.angle = Math.atan2(attract.x, attract.y);
     let angleRad = Math.atan2(attract.x, attract.y);
     this.velocity.y += Math.cos(angleRad) * enemySpeed;
   }
 
   moveEnemy() {
-    console.log(enemy.angle);
     let distance = boatPos.distance(this.pos);
     if (distance < 25) {
       this.enemySeek();
@@ -197,7 +198,7 @@ class Enemy extends EngineObject {
       1,
       0.5,
       numOfParticles,
-      1, // pos, angle, emitSize, emitTime, emitRate, emiteCone
+      0.5, // pos, angle, emitSize, emitTime, emitRate, emiteCone
       -1,
       vec2(16), // tileIndex, tileSize
       new Color(1, 1, 1),
@@ -207,7 +208,7 @@ class Enemy extends EngineObject {
       2,
       0.07,
       0.07,
-      0.1,
+      0.05,
       this.angleVelocity, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
       0.99,
       1,
@@ -251,7 +252,7 @@ class Obstacle extends EngineObject {
     this.dt = Math.PI / 1000;
     this.xrad = 15;
     this.yrad = 10;
-    this.renderOrder = 2;
+    this.renderOrder = -1;
   }
   moveObstacle() {
     this.pos.x = this.xStart + this.xrad * Math.sin(this.t + Math.PI / 2);
@@ -260,6 +261,35 @@ class Obstacle extends EngineObject {
     if (this.t >= 2 * Math.PI) {
       this.t -= 2 * Math.PI;
     }
+  }
+  whirl() {
+    let emitter = new ParticleEmitter(
+      this.pos,
+      this.angle,
+      0,
+      1,
+      10,
+      0, // pos, angle, emitSize, emitTime, emitRate, emiteCone
+      -1,
+      vec2(16), // tileIndex, tileSize
+      new Color(1, 1, 1),
+      new Color(0, 0, 0), // colorStartA, colorStartB
+      new Color(1, 1, 1, 0),
+      new Color(0, 0, 0, 0), // colorEndA, colorEndB
+      2,
+      0.1,
+      0.1,
+      0.1,
+      0.05, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
+      0.99,
+      1,
+      1,
+      PI,
+      0.05, // damping, angleDamping, gravityScale, particleCone, fadeRate,
+      0.5,
+      1 // randomness, collide, additive, randomColorLinear, renderOrder
+    );
+    emitter.trailScale = 1;
   }
 }
 
@@ -397,6 +427,9 @@ function gameUpdate() {
 
   obsticle.moveObstacle();
   obsticle.tileIndex = -1;
+  // obsticle.whirl();
+  console.log(obsticle.angle);
+  // obsticle.angleVelocity = 0.5;
 
   boat.whirlpool(obsticle.pos);
 
