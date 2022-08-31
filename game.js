@@ -4,10 +4,12 @@
 
 class Boat extends EngineObject {
   constructor(pos) {
-    super(pos, vec2(1, 3), 0);
+    super(pos, vec2(3, 3), 0);
     this.damping = 0.95;
     this.angleVelocity = 0;
     this.setCollision(1, 1);
+    this.tileSize = vec2(64, 64);
+    this.renderOrder = 2;
   }
   update() {
     const nextPos = this.pos.x + this.velocity.x;
@@ -95,7 +97,7 @@ class Boat extends EngineObject {
       0.5,
       numOfParticles,
       1, // pos, angle, emitSize, emitTime, emitRate, emiteCone
-      0,
+      -1,
       vec2(16), // tileIndex, tileSize
       new Color(1, 1, 1),
       new Color(0, 0, 0), // colorStartA, colorStartB
@@ -117,7 +119,8 @@ class Boat extends EngineObject {
 
     emitter.mass = 1;
     emitter.elasticity = 0.5;
-    emitter.setCollision(0, 0);
+    emitter.setCollision(0, 1);
+    console.log(emitter);
   }
 }
 
@@ -127,8 +130,8 @@ class Enemy extends EngineObject {
     this.color = new Color(0.8, 0, 0);
     this.setCollision(1, 1);
     this.aim = -20;
-    // this.axis = Math.floor(Math.random() * 2);
     this.axis = axis;
+    this.renderOrder = 2;
   }
   enemySeek() {
     let enemySpeed = Math.random() * (0.004 - 0.0002) + 0.0002;
@@ -321,32 +324,8 @@ function gameInit() {
     0
     // randomness, collide, additive, randomColorLinear, renderOrder
   );
-  initTileCollision(vec2(200, 100));
-  const tileLayer = new TileLayer();
-  const pos = vec2();
-  // get level data from the tiles image
-  const imageLevelDataRow = 1;
-  mainContext.drawImage(tileImage, 0, 0);
-  for (pos.x = tileCollisionSize.x; pos.x--; )
-    for (pos.y = tileCollisionSize.y; pos.y--; ) {
-      const data = mainContext.getImageData(
-        pos.x,
-        16 * imageLevelDataRow - pos.y - 1,
-        1,
-        1
-      ).data;
-      if (data[0]) {
-        setTileCollisionData(pos, 1);
-
-        const tileIndex = 1;
-        const direction = randInt(4);
-        const mirror = randInt(2);
-        const color = randColor();
-        const data = new TileLayerData(tileIndex, direction, mirror, color);
-        tileLayer.setData(pos, data);
-      }
-    }
-  tileLayer.redraw();
+  initTileCollision(vec2(5, 5));
+  const tileLayer = new TileLayer(vec2(), undefined, 64);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -358,9 +337,7 @@ function gameUpdate() {
   boatPos = boat.pos;
   boat.moveBoat();
   boat.calculateMoveSpeed();
-  if (moveSpeed > 0.4) {
-    boat.trail(moveSpeed / 10);
-  }
+
   if (!enemy) {
     enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2 + 10), 0);
     enemy2 = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2 - 15), 1);
@@ -370,6 +347,8 @@ function gameUpdate() {
     enemy.moveEnemy();
   }
   enemy2.moveEnemy();
+  enemy.tileIndex = -1;
+  enemy2.tileIndex = -1;
 
   // obsticle ||= new Obstacle(vec2(levelSize.x - 50, levelSize.y / 2));
   obsticle ||= new Obstacle(
@@ -377,6 +356,7 @@ function gameUpdate() {
   );
 
   obsticle.moveObstacle();
+  obsticle.tileIndex = -1;
 
   boat.whirlpool(obsticle.pos);
 
@@ -390,6 +370,8 @@ function gameUpdate() {
   if (!port) {
     port = new Port(vec2(2, levelSize.y / 2));
   }
+  soul.tileIndex = -1;
+  port.tileIndex = -1;
   if (isOverlapping(boatPos, vec2(1, 3), soul.pos, vec2(2, 2))) {
     soul.destroy();
     cargo = true;
@@ -409,8 +391,10 @@ function gameUpdate() {
     cargo = false;
   }
   energyCheck();
-  boat.tileIndex = 1;
-  console.log(boat);
+  boat.tileIndex = 0;
+  if (moveSpeed > 0.4) {
+    boat.trail(moveSpeed / 10);
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
