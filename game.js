@@ -66,7 +66,6 @@ class Boat extends EngineObject {
 
   calculateMoveSpeed() {
     moveSpeed = Math.floor(Math.abs(this.velocity.x + this.velocity.y * 100));
-    console.log(moveSpeed);
   }
 
   whirlpool(obsticlePos) {
@@ -88,7 +87,7 @@ class Boat extends EngineObject {
       this.pos.x - this.velocity.x,
       this.pos.y - this.velocity.y
     );
-    new ParticleEmitter(
+    let emitter = new ParticleEmitter(
       trailPos,
       this.angleVelocity,
       1,
@@ -112,8 +111,13 @@ class Boat extends EngineObject {
       PI,
       0.05, // damping, angleDamping, gravityScale, particleCone, fadeRate,
       0.5,
+      1,
+      0,
       1 // randomness, collide, additive, randomColorLinear, renderOrder
     );
+    console.log(emitter);
+    emitter.mass = 1;
+    emitter.setCollision(1, 0);
   }
 }
 
@@ -324,8 +328,8 @@ function gameUpdate() {
   boatPos = boat.pos;
   boat.moveBoat();
   boat.calculateMoveSpeed();
-  if(moveSpeed > 2) {
-    boat.trail(moveSpeed)
+  if (moveSpeed > 0) {
+    boat.trail(moveSpeed / 10);
   }
   if (!enemy) {
     enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2 + 10), 0);
