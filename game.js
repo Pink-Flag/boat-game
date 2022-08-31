@@ -115,9 +115,10 @@ class Boat extends EngineObject {
       0,
       1 // randomness, collide, additive, randomColorLinear, renderOrder
     );
-    console.log(emitter);
+
     emitter.mass = 1;
-    emitter.setCollision(1, 0);
+    emitter.elasticity = 0.5;
+    emitter.setCollision(0, 0);
   }
 }
 
@@ -315,8 +316,38 @@ function gameInit() {
     PI,
     0.05, // damping, angleDamping, gravityScale, particleCone, fadeRate,
     0.5,
-    1 // randomness, collide, additive, randomColorLinear, renderOrder
+    1,
+    0,
+    1,
+    0
+    // randomness, collide, additive, randomColorLinear, renderOrder
   );
+  initTileCollision(vec2(200, 100));
+  const tileLayer = new TileLayer();
+  const pos = vec2();
+  // get level data from the tiles image
+  const imageLevelDataRow = 1;
+  mainContext.drawImage(tileImage, 0, 0);
+  for (pos.x = tileCollisionSize.x; pos.x--; )
+    for (pos.y = tileCollisionSize.y; pos.y--; ) {
+      const data = mainContext.getImageData(
+        pos.x,
+        16 * imageLevelDataRow - pos.y - 1,
+        1,
+        1
+      ).data;
+      if (data[0]) {
+        setTileCollisionData(pos, 1);
+
+        const tileIndex = 1;
+        const direction = randInt(4);
+        const mirror = randInt(2);
+        const color = randColor();
+        const data = new TileLayerData(tileIndex, direction, mirror, color);
+        tileLayer.setData(pos, data);
+      }
+    }
+  tileLayer.redraw();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -379,6 +410,8 @@ function gameUpdate() {
     cargo = false;
   }
   energyCheck();
+  boat.tileIndex = 1;
+  console.log(boat);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -399,4 +432,11 @@ function gameRenderPost() {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Startup LittleJS Engine
-engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost);
+engineInit(
+  gameInit,
+  gameUpdate,
+  gameUpdatePost,
+  gameRender,
+  gameRenderPost,
+  "tiles.png"
+);
