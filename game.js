@@ -239,7 +239,6 @@ class Enemy extends EngineObject {
   }
   collideWithBoatDetection() {
     if (isOverlapping(this.pos, vec2(2, 3), boatPos, vec2(1.6, 3))) {
-      // soul.destroy();
       energy -= 1;
     }
   }
@@ -472,6 +471,12 @@ function gameUpdate() {
   checkGameOver();
 
   boat ||= new Boat(vec2(10, levelSize.y / 2 - 6));
+  port ||= new Port(vec2(2, levelSize.y / 2));
+  soul ||= new Soul(vec2(levelSize.x - 3, Math.random() * (35 - 5) + 5));
+  obsticle ||= new Obstacle(
+    vec2(Math.random() * (50 - 20) + 10, Math.random() * (30 - 10) + 10)
+  );
+
   boatPos = boat.pos;
   boat.calculateMoveSpeed();
 
@@ -488,17 +493,8 @@ function gameUpdate() {
   enemy.collideWithBoatDetection();
   enemy2.collideWithBoatDetection();
 
-  // obsticle ||= new Obstacle(vec2(levelSize.x - 50, levelSize.y / 2));
-  obsticle ||= new Obstacle(
-    vec2(Math.random() * (50 - 20) + 10, Math.random() * (30 - 10) + 10)
-  );
-
   obsticle.tileIndex = -1;
   obsticle.collideWithBoatDetection();
-  // obsticle.whirl();
-
-  // obsticle.angleVelocity = 0.5;
-
   boat.whirlpool(obsticle.pos);
 
   if (!isGameOver) {
@@ -510,19 +506,9 @@ function gameUpdate() {
       boat.trail(moveSpeed);
     }
   }
-  function createSoul() {
-    soul = new Soul(vec2(levelSize.x - 3, Math.random() * (35 - 5) + 5));
-  }
 
-  if (!soul) {
-    createSoul();
-  }
-  if (!port) {
-    port = new Port(vec2(2, levelSize.y / 2));
-  }
   soul.tileIndex = -1;
   port.tileIndex = -1;
-  //export this out into function
 
   dockSoul();
   collectSoul();
@@ -538,14 +524,7 @@ function gameUpdatePost() {}
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameRender() {
-  let blueRec = drawRect(
-    cameraPos,
-    levelSize,
-    new Color(0.31, 0.396, 0.651),
-    0,
-    0
-  );
-  console.log(drawTile);
+  drawRect(cameraPos, levelSize, new Color(0.31, 0.396, 0.651), 0, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
