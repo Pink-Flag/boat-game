@@ -219,13 +219,12 @@ class Enemy extends EngineObject {
   }
 
   sparks() {
-    console.log("spark");
     let sparkEmitter = new ParticleEmitter(
       this.pos,
       this.angleVelocity,
       1,
       0.5,
-      15,
+      10,
       Math.PI, // pos, angle, emitSize, emitTime, emitRate, emiteCone
       -1,
       vec2(16), // tileIndex, tileSize
@@ -234,8 +233,8 @@ class Enemy extends EngineObject {
       new Color(0.9, 0.9, 0.1, 0),
       new Color(0, 0, 0, 0), // colorEndA, colorEndB
       2,
-      0.2,
-      0.2,
+      0.1,
+      0.1,
       0.05,
       this.angleVelocity, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
       0.99,
@@ -246,6 +245,7 @@ class Enemy extends EngineObject {
       0.1,
       1 // randomness, collide, additive, randomColorLinear, renderOrder
     );
+    sparkEmitter.trailScale = 10;
   }
 
   update() {
@@ -267,7 +267,9 @@ class Enemy extends EngineObject {
   collideWithBoatDetection() {
     if (isOverlapping(this.pos, vec2(2, 3), boatPos, vec2(1.6, 3))) {
       energy -= 1;
-      this.sparks();
+      if (!isGameOver) {
+        this.sparks();
+      }
     }
   }
 }
