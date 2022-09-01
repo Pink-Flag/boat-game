@@ -217,6 +217,37 @@ class Enemy extends EngineObject {
     emitter.mass = 1;
     emitter.elasticity = 0.5;
   }
+
+  sparks() {
+    console.log("spark");
+    let sparkEmitter = new ParticleEmitter(
+      this.pos,
+      this.angleVelocity,
+      1,
+      0.5,
+      15,
+      Math.PI, // pos, angle, emitSize, emitTime, emitRate, emiteCone
+      -1,
+      vec2(16), // tileIndex, tileSize
+      new Color(1, 0, 0),
+      new Color(0, 0, 0), // colorStartA, colorStartB
+      new Color(0.9, 0.9, 0.1, 0),
+      new Color(0, 0, 0, 0), // colorEndA, colorEndB
+      2,
+      0.2,
+      0.2,
+      0.05,
+      this.angleVelocity, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
+      0.99,
+      1,
+      1,
+      PI,
+      0.05, // damping, angleDamping, gravityScale, particleCone, fadeRate,
+      0.1,
+      1 // randomness, collide, additive, randomColorLinear, renderOrder
+    );
+  }
+
   update() {
     const nextPos = this.pos.x + this.velocity.x;
     if (
@@ -236,6 +267,7 @@ class Enemy extends EngineObject {
   collideWithBoatDetection() {
     if (isOverlapping(this.pos, vec2(2, 3), boatPos, vec2(1.6, 3))) {
       energy -= 1;
+      this.sparks();
     }
   }
 }
@@ -292,7 +324,6 @@ class Obstacle extends EngineObject {
   }
   collideWithBoatDetection() {
     if (isOverlapping(this.pos, vec2(2, 3), boatPos, vec2(1.6, 3))) {
-      // soul.destroy();
       energy -= 1;
     }
   }
@@ -323,14 +354,6 @@ class Boost extends EngineObject {
     this.renderOrder = 2;
     this.tileIndex = -1;
   }
-  //   function collectSoul() {
-  //   if (isOverlapping(boatPos, vec2(1, 3), soul.pos, vec2(2, 2))) {
-  //     soul.destroy();
-  //     cargo = true;
-  //     boat.color = new Color(0.9, 0.9, 0.1);
-  //   }
-  // }
-
   boatCollectBoost() {
     if (isOverlapping(this.pos, vec2(1, 1), boatPos, vec2(1.6, 3))) {
       boost.pos = vec2(100, 100);
