@@ -1,7 +1,3 @@
-//energy bar and power ups?
-//particles to make water sparkle
-//foam trail behind boat, ripple
-
 class Boat extends EngineObject {
   constructor(pos) {
     super(pos, vec2(1.6, 3), 0);
@@ -543,7 +539,11 @@ function gameUpdate() {
 
   boost ||= new Boost(vec2(100, 100));
 
-  if (boat.getAliveTime() % 30 === 0) {
+  if (
+    boat.getAliveTime() % 30 === 0 &&
+    !isGameOver &&
+    boat.getAliveTime() > 10
+  ) {
     showBoost();
   }
 
