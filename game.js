@@ -354,11 +354,52 @@ function energyCheck() {
   }
 }
 
-// class Shimmer extends Particle{
-//   constructor(pos, tileIndex, tileSize, angle) {
-//     super(pos, new Vector2, tileIndex, tileSize, angle)
-//   }
-// }
+function checkGameOver() {
+  if (energy <= 0 || isGameOver) {
+    isGameOver = true;
+    gameOver();
+  }
+}
+
+function gameOver() {
+  energy = 0;
+  drawTextScreen(
+    "GAME OVER",
+    vec2(overlayCanvas.width / 2, overlayCanvas.height / 2),
+    100,
+    new Color(),
+    12
+  );
+  drawTextScreen(
+    "press space to start again",
+    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.66),
+    60,
+    new Color(),
+    8
+  );
+}
+function dockSoul() {
+  if (isOverlapping(boatPos, vec2(1, 3), port.pos, vec2(2, 4))) {
+    if (cargo) {
+      boat.color = new Color(0.9, 0.9, 0.9);
+      if (energy < 80) {
+        energy += 20;
+      } else {
+        energy = 100;
+      }
+      score++;
+      createSoul();
+    }
+    cargo = false;
+  }
+}
+function collectSoul() {
+  if (isOverlapping(boatPos, vec2(1, 3), soul.pos, vec2(2, 2))) {
+    soul.destroy();
+    cargo = true;
+    boat.color = new Color(0.9, 0.9, 0.1);
+  }
+}
 
 ("use strict");
 
@@ -381,6 +422,7 @@ let boat,
   pos2,
   moveSpeed,
   cargo = false,
+  isGameOver = false,
   energyBarColour = new Color(0, 1, 0.5);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -427,10 +469,10 @@ function gameInit() {
 function gameUpdate() {
   energyRegain();
 
-  boat ||= new Boat(vec2(10, levelSize.y / 2 - 6));
+  checkGameOver();
 
+  boat ||= new Boat(vec2(10, levelSize.y / 2 - 6));
   boatPos = boat.pos;
-  boat.moveBoat();
   boat.calculateMoveSpeed();
 
   if (!enemy) {
@@ -438,12 +480,11 @@ function gameUpdate() {
     enemy2 = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2 - 15), 1);
   }
 
-  if (enemy.pos.distance(enemy2.pos) > 10) {
+  if (enemy.pos.distance(enemy2.pos) > 10 && !isGameOver) {
     enemy.moveEnemy();
     enemy.trail(3);
   }
-  enemy2.moveEnemy();
-  enemy2.trail(3);
+
   enemy.collideWithBoatDetection();
   enemy2.collideWithBoatDetection();
 
@@ -452,7 +493,6 @@ function gameUpdate() {
     vec2(Math.random() * (50 - 20) + 10, Math.random() * (30 - 10) + 10)
   );
 
-  obsticle.moveObstacle();
   obsticle.tileIndex = -1;
   obsticle.collideWithBoatDetection();
   // obsticle.whirl();
@@ -461,6 +501,15 @@ function gameUpdate() {
 
   boat.whirlpool(obsticle.pos);
 
+  if (!isGameOver) {
+    boat.moveBoat();
+    enemy2.moveEnemy();
+    obsticle.moveObstacle();
+    enemy2.trail(3);
+    if (moveSpeed > 0.8) {
+      boat.trail(moveSpeed);
+    }
+  }
   function createSoul() {
     soul = new Soul(vec2(levelSize.x - 3, Math.random() * (35 - 5) + 5));
   }
@@ -474,29 +523,13 @@ function gameUpdate() {
   soul.tileIndex = -1;
   port.tileIndex = -1;
   //export this out into function
-  if (isOverlapping(boatPos, vec2(1, 3), soul.pos, vec2(2, 2))) {
-    soul.destroy();
-    cargo = true;
-    boat.color = new Color(0.9, 0.9, 0.1);
-  }
-  if (isOverlapping(boatPos, vec2(1, 3), port.pos, vec2(2, 4))) {
-    if (cargo) {
-      boat.color = new Color(0.9, 0.9, 0.9);
-      if (energy < 80) {
-        energy += 20;
-      } else {
-        energy = 100;
-      }
-      score++;
-      createSoul();
-    }
-    cargo = false;
-  }
+
+  dockSoul();
+  collectSoul();
+
   energyCheck();
   boat.tileIndex = 0;
-  if (moveSpeed > 0.8) {
-    boat.trail(moveSpeed);
-  }
+
   energyBarColourCheck();
 }
 
@@ -505,15 +538,32 @@ function gameUpdatePost() {}
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameRender() {
-  drawRect(cameraPos, levelSize, new Color(0.31, 0.396, 0.651), 0, 0);
+  let blueRec = drawRect(
+    cameraPos,
+    levelSize,
+    new Color(0.31, 0.396, 0.651),
+    0,
+    0
+  );
+  console.log(drawTile);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameRenderPost() {
   // draw to overlay canvas for hud rendering
-  drawTextScreen(score, vec2(overlayCanvas.width / 2, 80), 80, new Color(), 9);
-  let energybar = vec2(energy / 6, 1);
-  drawRect(vec2(50 + energy / 12, 38), energybar, energyBarColour, 0, 0);
+  if (!isGameOver) {
+    drawTextScreen(
+      score,
+      vec2(overlayCanvas.width / 2, 80),
+      80,
+      new Color(),
+      9
+    );
+    let energybar = vec2(energy / 6, 1);
+    drawRect(vec2(50 + energy / 12, 38), energybar, energyBarColour, 0, 0);
+  } else {
+    drawRect(cameraPos, levelSize, new Color(0.21, 0.21, 0.21), 0, 0);
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
