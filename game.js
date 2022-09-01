@@ -391,15 +391,22 @@ function gameOver() {
 
   drawTextScreen(
     "GAME OVER",
-    vec2(overlayCanvas.width / 2, overlayCanvas.height / 2),
+    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.33),
     100,
     new Color(),
     12
   );
   drawTextScreen(
-    "press space to start again",
-    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.66),
+    `you scored ${score} points`,
+    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.5),
     60,
+    new Color(),
+    8
+  );
+  drawTextScreen(
+    "press space to start again",
+    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.61),
+    45,
     new Color(),
     8
   );
