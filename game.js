@@ -312,6 +312,7 @@ class Port extends EngineObject {
     super(pos, vec2(2, 4), 0);
     this.color = new Color(0.9, 0.9, 0.1);
     this.renderOrder = 1;
+    this.tileIndex = -1;
   }
 }
 
@@ -436,6 +437,7 @@ function gameReset() {
   score = 0;
   boat.pos = vec2(10, levelSize.y / 2 - 6);
   boat.angle = 0;
+  shimmer.emitRate = 15;
   enemy.pos = vec2(levelSize.x - 30, levelSize.y / 2 + 10);
   enemy2.pos = vec2(levelSize.x - 10, levelSize.y / 2 - 15);
   obsticle.pos = vec2(
@@ -459,8 +461,8 @@ function showBoost() {
   }
   setTimeout(destroyBoost, 10000);
 }
-function shimmer() {
-  new ParticleEmitter(
+function createShimmer() {
+  shimmer = new ParticleEmitter(
     vec2(36, 20),
     0,
     vec2(72, 40),
@@ -505,6 +507,7 @@ let boat,
   soul,
   energy = 100,
   port,
+  shimmer,
   score = 0,
   speed = 0.3,
   technicalArea,
@@ -522,10 +525,9 @@ function gameInit() {
   canvasFixedSize = vec2(1280, 720);
   levelSize = vec2(72, 40);
   cameraPos = levelSize.scale(0.5);
-  shimmer();
+  createShimmer();
   initTileCollision(vec2(5, 5));
   const tileLayer = new TileLayer(vec2(), undefined, 64);
-  // showBoost();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -585,7 +587,10 @@ function gameUpdate() {
       boat.trail(moveSpeed);
     }
   }
-  port.tileIndex = -1;
+
+  if (isGameOver) {
+    shimmer.emitRate = 0;
+  }
 
   dockSoul();
   collectSoul();
