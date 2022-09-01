@@ -319,6 +319,34 @@ class Port extends EngineObject {
   }
 }
 
+class Boost extends EngineObject {
+  constructor(pos) {
+    super(pos, vec2(1, 1), 0);
+    this.color = new Color(0.9, 0, 0);
+    this.renderOrder = 2;
+    this.tileIndex = -1;
+  }
+  //   function collectSoul() {
+  //   if (isOverlapping(boatPos, vec2(1, 3), soul.pos, vec2(2, 2))) {
+  //     soul.destroy();
+  //     cargo = true;
+  //     boat.color = new Color(0.9, 0.9, 0.1);
+  //   }
+  // }
+
+  boatCollectBoost() {
+    if (isOverlapping(this.pos, vec2(1, 1), boatPos, vec2(1.6, 3))) {
+      boost.pos = vec2(100, 100);
+      if (energy <= 75) {
+        energy += 25;
+      } else {
+        energy = 100;
+      }
+      console.log("energy");
+    }
+  }
+}
+
 function energyRegain() {
   if (energy < 100) {
     energy += 0.05;
@@ -425,6 +453,21 @@ function gameReset() {
   }
 }
 
+function showBoost() {
+  console.log("inshow boost");
+  setInterval(() => {
+    boost.pos = vec2(
+      Math.random() * (50 - 20) + 10,
+      Math.random() * (30 - 10) + 10
+    );
+  }, 5000);
+
+  function destroyBoost() {
+    boost.pos = vec2(100, 100);
+  }
+  setTimeout(destroyBoost, 10000);
+}
+
 ("use strict");
 
 // game variables
@@ -447,7 +490,8 @@ let boat,
   moveSpeed,
   cargo = false,
   isGameOver = false,
-  energyBarColour = new Color(0, 1, 0.5);
+  boost;
+energyBarColour = new Color(0, 1, 0.5);
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameInit() {
@@ -487,11 +531,11 @@ function gameInit() {
   );
   initTileCollision(vec2(5, 5));
   const tileLayer = new TileLayer(vec2(), undefined, 64);
+  // showBoost();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
-  console.log(cargo);
   energyRegain();
   checkGameOver();
 
@@ -501,12 +545,22 @@ function gameUpdate() {
     vec2(Math.random() * (50 - 20) + 10, Math.random() * (30 - 10) + 10)
   );
 
+  boost ||= new Boost(vec2(100, 100));
+
+  if (boat.getAliveTime() % 9 === 0) {
+    console.log("heree");
+    showBoost();
+  }
+
   if (!soul) {
     createSoul();
   }
 
   boatPos = boat.pos;
   boat.calculateMoveSpeed();
+  if (boost) {
+    boost.boatCollectBoost();
+  }
 
   if (!enemy) {
     enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2 + 10), 0);
