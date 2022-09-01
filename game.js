@@ -307,6 +307,7 @@ class Soul extends EngineObject {
     super(pos, vec2(2, 2), 0);
     this.color = new Color(0.9, 0.9, 0.1);
     this.renderOrder = 2;
+    this.tileIndex = -1;
   }
 }
 
@@ -378,6 +379,10 @@ function gameOver() {
     8
   );
 }
+function createSoul() {
+  soul = new Soul(vec2(levelSize.x - 3, Math.random() * (35 - 5) + 5));
+}
+
 function dockSoul() {
   if (isOverlapping(boatPos, vec2(1, 3), port.pos, vec2(2, 4))) {
     if (cargo) {
@@ -413,6 +418,11 @@ function gameReset() {
     Math.random() * (50 - 20) + 10,
     Math.random() * (30 - 10) + 10
   );
+  if (cargo) {
+    boat.color = new Color(0.9, 0.9, 0.9);
+    cargo = false;
+    createSoul();
+  }
 }
 
 ("use strict");
@@ -481,15 +491,19 @@ function gameInit() {
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
+  console.log(cargo);
   energyRegain();
   checkGameOver();
 
   boat ||= new Boat(vec2(10, levelSize.y / 2 - 6));
   port ||= new Port(vec2(2, levelSize.y / 2));
-  soul ||= new Soul(vec2(levelSize.x - 3, Math.random() * (35 - 5) + 5));
   obsticle ||= new Obstacle(
     vec2(Math.random() * (50 - 20) + 10, Math.random() * (30 - 10) + 10)
   );
+
+  if (!soul) {
+    createSoul();
+  }
 
   boatPos = boat.pos;
   boat.calculateMoveSpeed();
@@ -520,8 +534,6 @@ function gameUpdate() {
       boat.trail(moveSpeed);
     }
   }
-
-  soul.tileIndex = -1;
   port.tileIndex = -1;
 
   dockSoul();
