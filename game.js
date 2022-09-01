@@ -459,7 +459,38 @@ function showBoost() {
   }
   setTimeout(destroyBoost, 10000);
 }
-
+function shimmer() {
+  new ParticleEmitter(
+    vec2(36, 20),
+    0,
+    vec2(72, 40),
+    0,
+    15,
+    PI, // pos, angle, emitSize, emitTime, emitRate, emiteCone
+    -1,
+    vec2(16), // tileIndex, tileSize
+    new Color(1, 1, 1),
+    new Color(0, 0, 1), // colorStartA, colorStartB
+    new Color(1, 1, 1, 0),
+    new Color(0, 0, 1, 0), // colorEndA, colorEndB
+    2,
+    0.1,
+    0.1,
+    0,
+    0.05, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
+    0.99,
+    1,
+    1,
+    PI,
+    0.05, // damping, angleDamping, gravityScale, particleCone, fadeRate,
+    0.5,
+    1,
+    0,
+    1,
+    0
+    // randomness, collide, additive, randomColorLinear, renderOrder
+  );
+}
 ("use strict");
 
 // game variables
@@ -491,36 +522,7 @@ function gameInit() {
   canvasFixedSize = vec2(1280, 720);
   levelSize = vec2(72, 40);
   cameraPos = levelSize.scale(0.5);
-  new ParticleEmitter(
-    vec2(36, 20),
-    0,
-    vec2(72, 40),
-    0,
-    8,
-    PI, // pos, angle, emitSize, emitTime, emitRate, emiteCone
-    -1,
-    vec2(16), // tileIndex, tileSize
-    new Color(1, 1, 1),
-    new Color(0, 0, 0), // colorStartA, colorStartB
-    new Color(1, 1, 1, 0),
-    new Color(0, 0, 0, 0), // colorEndA, colorEndB
-    2,
-    0.1,
-    0.1,
-    0,
-    0.05, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
-    0.99,
-    1,
-    1,
-    PI,
-    0.05, // damping, angleDamping, gravityScale, particleCone, fadeRate,
-    0.5,
-    1,
-    0,
-    1,
-    0
-    // randomness, collide, additive, randomColorLinear, renderOrder
-  );
+  shimmer();
   initTileCollision(vec2(5, 5));
   const tileLayer = new TileLayer(vec2(), undefined, 64);
   // showBoost();
