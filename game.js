@@ -454,14 +454,10 @@ function gameReset() {
 }
 
 function showBoost() {
-  console.log("inshow boost");
-  setInterval(() => {
-    boost.pos = vec2(
-      Math.random() * (50 - 20) + 10,
-      Math.random() * (30 - 10) + 10
-    );
-  }, 5000);
-
+  boost.pos = vec2(
+    Math.random() * (50 - 20) + 10,
+    Math.random() * (30 - 10) + 10
+  );
   function destroyBoost() {
     boost.pos = vec2(100, 100);
   }
@@ -547,8 +543,7 @@ function gameUpdate() {
 
   boost ||= new Boost(vec2(100, 100));
 
-  if (boat.getAliveTime() % 9 === 0) {
-    console.log("heree");
+  if (boat.getAliveTime() % 30 === 0) {
     showBoost();
   }
 
