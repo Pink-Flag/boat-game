@@ -121,7 +121,6 @@ class Boat extends EngineObject {
 
     emitter.mass = 1;
     emitter.elasticity = 0.5;
-    emitter.setCollision(0, 1);
   }
 }
 
@@ -221,7 +220,6 @@ class Enemy extends EngineObject {
 
     emitter.mass = 1;
     emitter.elasticity = 0.5;
-    emitter.setCollision(0, 1);
   }
   update() {
     const nextPos = this.pos.x + this.velocity.x;
@@ -238,6 +236,12 @@ class Enemy extends EngineObject {
       this.velocity.y *= -0.25;
     }
     super.update();
+  }
+  collideWithBoatDetection() {
+    if (isOverlapping(this.pos, vec2(2, 3), boatPos, vec2(1.6, 3))) {
+      // soul.destroy();
+      energy -= 1;
+    }
   }
 }
 
@@ -291,6 +295,12 @@ class Obstacle extends EngineObject {
     );
     emitter.trailScale = 1;
   }
+  collideWithBoatDetection() {
+    if (isOverlapping(this.pos, vec2(2, 3), boatPos, vec2(1.6, 3))) {
+      // soul.destroy();
+      energy -= 1;
+    }
+  }
 }
 
 class Soul extends EngineObject {
@@ -312,6 +322,20 @@ class Port extends EngineObject {
 function energyRegain() {
   if (energy < 100) {
     energy += 0.05;
+  }
+}
+
+function energyBarColourCheck() {
+  if (energy < 20) {
+    energyBarColour = new Color(1, 0, 0);
+  } else if (energy < 40) {
+    energyBarColour = new Color(1, 0.5, 0);
+  } else if (energy < 60) {
+    energyBarColour = new Color(1, 1, 0);
+  } else if (energy < 80) {
+    energyBarColour = new Color(0.5, 1, 0);
+  } else {
+    energyBarColour = new Color(0, 1, 0);
   }
 }
 
@@ -356,7 +380,8 @@ let boat,
   pos1,
   pos2,
   moveSpeed,
-  cargo = false;
+  cargo = false,
+  energyBarColour = new Color(0, 1, 0.5);
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameInit() {
@@ -419,17 +444,22 @@ function gameUpdate() {
   }
   enemy2.moveEnemy();
   enemy2.trail(3);
+  enemy.collideWithBoatDetection();
+  enemy2.collideWithBoatDetection();
 
   // obsticle ||= new Obstacle(vec2(levelSize.x - 50, levelSize.y / 2));
   obsticle ||= new Obstacle(
-    vec2(Math.random() * 30 + 15, Math.random() * 10 + 15)
+    vec2(Math.random() * (50 - 20) + 10, Math.random() * (30 - 10) + 10)
   );
-  console.log(obsticle.pos.y);
 
   obsticle.moveObstacle();
   obsticle.tileIndex = -1;
-  console.log(obsticle.angle);
-   boat.whirlpool(obsticle.pos);
+  obsticle.collideWithBoatDetection();
+  // obsticle.whirl();
+
+  // obsticle.angleVelocity = 0.5;
+
+  boat.whirlpool(obsticle.pos);
 
   function createSoul() {
     soul = new Soul(vec2(levelSize.x - 3, Math.random() * (35 - 5) + 5));
@@ -443,6 +473,7 @@ function gameUpdate() {
   }
   soul.tileIndex = -1;
   port.tileIndex = -1;
+  //export this out into function
   if (isOverlapping(boatPos, vec2(1, 3), soul.pos, vec2(2, 2))) {
     soul.destroy();
     cargo = true;
@@ -466,6 +497,7 @@ function gameUpdate() {
   if (moveSpeed > 0.8) {
     boat.trail(moveSpeed);
   }
+  energyBarColourCheck();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -481,7 +513,7 @@ function gameRenderPost() {
   // draw to overlay canvas for hud rendering
   drawTextScreen(score, vec2(overlayCanvas.width / 2, 80), 80, new Color(), 9);
   let energybar = vec2(energy / 6, 1);
-  drawRect(vec2(50 + energy / 12, 38), energybar, new Color(0, 1, 0.5), 0, 0);
+  drawRect(vec2(50 + energy / 12, 38), energybar, energyBarColour, 0, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
