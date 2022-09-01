@@ -362,6 +362,7 @@ function checkGameOver() {
 
 function gameOver() {
   energy = 0;
+
   drawTextScreen(
     "GAME OVER",
     vec2(overlayCanvas.width / 2, overlayCanvas.height / 2),
@@ -398,6 +399,20 @@ function collectSoul() {
     cargo = true;
     boat.color = new Color(0.9, 0.9, 0.1);
   }
+}
+
+function gameReset() {
+  isGameOver = false;
+  energy = 100;
+  score = 0;
+  boat.pos = vec2(10, levelSize.y / 2 - 6);
+  boat.angle = 0;
+  enemy.pos = vec2(levelSize.x - 30, levelSize.y / 2 + 10);
+  enemy2.pos = vec2(levelSize.x - 10, levelSize.y / 2 - 15);
+  obsticle.pos = vec2(
+    Math.random() * (50 - 20) + 10,
+    Math.random() * (30 - 10) + 10
+  );
 }
 
 ("use strict");
@@ -467,7 +482,6 @@ function gameInit() {
 ///////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
   energyRegain();
-
   checkGameOver();
 
   boat ||= new Boat(vec2(10, levelSize.y / 2 - 6));
@@ -517,6 +531,10 @@ function gameUpdate() {
   boat.tileIndex = 0;
 
   energyBarColourCheck();
+
+  if (isGameOver && keyWasPressed(32, 0)) {
+    gameReset();
+  }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
