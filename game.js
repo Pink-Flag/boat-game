@@ -228,19 +228,19 @@ class Enemy extends EngineObject {
       this.pos.x + Math.sin(this.angle),
       this.pos.y + Math.cos(this.angle)
     );
-    let sparkEmitter = new ParticleEmitter(
+    sparkEmitter = new ParticleEmitter(
       sparkPos,
-      this.angleVelocity,
-      1,
+      this.angle,
       0.5,
+      0.4,
       15,
-      Math.PI, // pos, angle, emitSize, emitTime, emitRate, emiteCone
+      1.6, // pos, angle, emitSize, emitTime, emitRate, emiteCone
       -1,
       vec2(16), // tileIndex, tileSize
-      new Color(1, 0, 0),
-      new Color(0, 0, 0), // colorStartA, colorStartB
-      new Color(0.9, 0.9, 0.1, 0),
-      new Color(0, 0, 0, 0), // colorEndA, colorEndB
+      new Color(1, 1, 0.7),
+      new Color(1, 0, 0), // colorStartA, colorStartB
+      new Color(0.9, 0.9, 0.1),
+      new Color(0.9, 0.9, 0.1), // colorEndA, colorEndB
       2,
       0.2,
       0.2,
@@ -254,6 +254,7 @@ class Enemy extends EngineObject {
       0.1,
       1 // randomness, collide, additive, randomColorLinear, renderOrder
     );
+    sparkEmitter.trailScale = 3;
   }
 
   update() {
@@ -275,9 +276,10 @@ class Enemy extends EngineObject {
     super.update();
   }
   collideWithBoatDetection() {
+    console.log(enemy2.angle);
     if (isOverlapping(this.pos, vec2(2.5, 4.41), boatPos, vec2(2.5, 4.41))) {
       energy -= 1;
-      if (canSpark) {
+      if (canSpark && !isGameOver) {
         this.sparks();
         canSpark = false;
       }
@@ -361,6 +363,27 @@ class Port extends EngineObject {
     this.color = new Color(0.9, 0.9, 0.1);
     this.renderOrder = 1;
     this.tileIndex = -1;
+  }
+}
+class Hydra extends EngineObject {
+  constructor(pos) {
+    super(pos, vec2(1, 1));
+    this.color = new Color(0, 1, 0.1);
+    this.tileIndex = -1;
+  }
+
+  moveHydra() {
+    if (this.pos.x < 60) {
+      this.velocity.x = 0.1;
+    } else {
+      this.velocity.x = 0;
+    }
+    if (this.pos.x > 60 && this.pos.y > 5) {
+      this.velocity.y = -0.1;
+    } else {
+      this.velocity.y = 0;
+    }
+    console.log(this.pos);
   }
 }
 
@@ -567,6 +590,8 @@ let boat,
   cargo = false,
   isGameOver = false,
   boost,
+  sparkEmitter,
+  hydra,
   canSpark = true;
 energyBarColour = new Color(0, 1, 0.5);
 
@@ -583,85 +608,72 @@ function gameInit() {
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
-  energyRegain();
-  checkGameOver();
-
-  boat ||= new Boat(vec2(10, levelSize.y / 2 - 6));
-  port ||= new Port(vec2(2, levelSize.y / 2));
-  obstacle ||= new Obstacle(
-    vec2(Math.random() * (50 - 20) + 15, Math.random() * (30 - 10) + 10)
-  );
-  boost ||= new Boost(vec2(100, 100));
-
-  if (
-    boat.getAliveTime() - (currentAliveTime % 30) === 0 &&
-    !isGameOver &&
-    boat.getAliveTime() - currentAliveTime > 10
-  ) {
-    showBoost();
-  }
-
-  if (!soul) {
-    createSoul();
-  }
-
-  boatPos = boat.pos;
-  boat.calculateMoveSpeed();
-  if (boost) {
-    boost.boatCollectBoost();
-  }
-
-  if (!enemy) {
-    enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2 + 10), 0, true);
-    enemy2 = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2 - 15), 1, true);
-    enemy3 = new Enemy(vec2(levelSize.x - 20, levelSize.y / 2 - 25), 2);
-  }
-
-  if (enemy.pos.distance(enemy2.pos) > 10 && !isGameOver) {
-    enemy.moveEnemy();
-    enemy.trail(3);
-  }
-
-  enemy.collideWithBoatDetection();
-  enemy2.collideWithBoatDetection();
-  enemy3.collideWithBoatDetection();
-
-  if (score > 5 && enemy3.pos.y < 0) {
-    enemy3.enemySeek();
-  } else if (score > 5 && enemy3.pos.y > 1) {
-    enemy3.moveEnemy();
-    enemy3.active = true;
-  }
-
-  obstacle.tileIndex = -1;
-  obstacle.collideWithBoatDetection();
-  boat.whirlpool(obstacle.pos);
-
-  if (!isGameOver) {
-    boat.moveBoat();
-    enemy2.moveEnemy();
-    obstacle.moveObstacle();
-    enemy2.trail(3);
-    if (moveSpeed > 0.8) {
-      boat.trail(moveSpeed);
-    }
-  }
-
-  if (isGameOver) {
-    shimmer.emitRate = 0;
-  }
-
-  dockSoul();
-  collectSoul();
-
-  energyCheck();
-  boat.tileIndex = 0;
-
-  energyBarColourCheck();
-
-  if (isGameOver && keyWasPressed(32, 0)) {
-    gameReset();
-  }
+  hydra ||= new Hydra(vec2(10, 20));
+  hydra.moveHydra();
+  // energyRegain();
+  // checkGameOver();
+  // boat ||= new Boat(vec2(10, levelSize.y / 2 - 6));
+  // port ||= new Port(vec2(2, levelSize.y / 2));
+  // obstacle ||= new Obstacle(
+  //   vec2(Math.random() * (50 - 20) + 15, Math.random() * (30 - 10) + 10)
+  // );
+  // boost ||= new Boost(vec2(100, 100));
+  // if (
+  //   boat.getAliveTime() - (currentAliveTime % 30) === 0 &&
+  //   !isGameOver &&
+  //   boat.getAliveTime() - currentAliveTime > 10
+  // ) {
+  //   showBoost();
+  // }
+  // if (!soul) {
+  //   createSoul();
+  // }
+  // boatPos = boat.pos;
+  // boat.calculateMoveSpeed();
+  // if (boost) {
+  //   boost.boatCollectBoost();
+  // }
+  // if (!enemy) {
+  //   enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2 + 10), 0, true);
+  //   enemy2 = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2 - 15), 1, true);
+  //   enemy3 = new Enemy(vec2(levelSize.x - 20, levelSize.y / 2 - 25), 2);
+  // }
+  // if (enemy.pos.distance(enemy2.pos) > 10 && !isGameOver) {
+  //   enemy.moveEnemy();
+  //   enemy.trail(3);
+  // }
+  // enemy.collideWithBoatDetection();
+  // enemy2.collideWithBoatDetection();
+  // enemy3.collideWithBoatDetection();
+  // if (score > 5 && enemy3.pos.y < 0) {
+  //   enemy3.enemySeek();
+  // } else if (score > 5 && enemy3.pos.y > 1) {
+  //   enemy3.moveEnemy();
+  //   enemy3.active = true;
+  // }
+  // obstacle.tileIndex = -1;
+  // obstacle.collideWithBoatDetection();
+  // boat.whirlpool(obstacle.pos);
+  // if (!isGameOver) {
+  //   boat.moveBoat();
+  //   enemy2.moveEnemy();
+  //   obstacle.moveObstacle();
+  //   enemy2.trail(3);
+  //   if (moveSpeed > 0.8) {
+  //     boat.trail(moveSpeed);
+  //   }
+  // }
+  // if (isGameOver) {
+  //   shimmer.emitRate = 0;
+  // }
+  // dockSoul();
+  // collectSoul();
+  // energyCheck();
+  // boat.tileIndex = 0;
+  // energyBarColourCheck();
+  // if (isGameOver && keyWasPressed(32, 0)) {
+  //   gameReset();
+  // }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
