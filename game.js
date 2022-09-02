@@ -1,9 +1,9 @@
 class Boat extends EngineObject {
   constructor(pos) {
-    super(pos, vec2(1.6, 3), 0);
+    super(pos, vec2(2, 3.91), 0);
     this.damping = 0.95;
     this.angleVelocity = 0;
-    this.setCollision(1, 1);
+    this.setCollision(1, 1, 1);
     this.tileSize = vec2(23, 45);
     this.renderOrder = 2;
   }
@@ -127,9 +127,9 @@ class Boat extends EngineObject {
 
 class Enemy extends EngineObject {
   constructor(pos, axis, active = false) {
-    super(pos, vec2(1.6, 3), 0);
+    super(pos, vec2(2, 3.91), 0);
     this.color = new Color(0.8, 0, 0);
-    this.setCollision(1, 1);
+    this.setCollision(1, 1, 1);
     this.aim = -20;
     this.axis = axis;
     this.tileSize = vec2(23, 45);
@@ -272,10 +272,11 @@ class Enemy extends EngineObject {
     super.update();
   }
   collideWithBoatDetection() {
-    if (isOverlapping(this.pos, vec2(2, 3), boatPos, vec2(1.6, 3))) {
-      energy -= 1;
-      this.sparks();
-    }
+    // if (isOverlapping(this.pos, vec2(2, 3.91), boatPos, vec2(2, 3.91))) {
+    //   console.log("am i in here i don't know");
+    //   energy -= 1;
+    //   this.sparks();
+    // }
   }
 }
 
@@ -479,10 +480,9 @@ function gameReset() {
   enemy3.pos = vec2(levelSize.x - 20, levelSize.y / 2 - 25);
   currentAliveTime = boat.getAliveTime();
   enemy3.active = false;
-  obsticle.pos = vec2(
-    Math.random() * (50 - 20) + 10,
-    Math.random() * (30 - 10) + 10
-  );
+  obsticle.xStart = Math.random() * (50 - 20) + 20;
+  obsticle.yStart = Math.random() * (30 - 10) + 10;
+
   if (cargo) {
     boat.color = new Color(0.9, 0.9, 0.9);
     cargo = false;
@@ -581,6 +581,7 @@ function gameUpdate() {
   obsticle ||= new Obstacle(
     vec2(Math.random() * (50 - 20) + 10, Math.random() * (30 - 10) + 10)
   );
+  console.log(obsticle.pos);
 
   boost ||= new Boost(vec2(100, 100));
 
