@@ -373,12 +373,12 @@ class Hydra extends EngineObject {
   }
 
   moveHydra() {
-    if (this.pos.x < 60) {
+    if (this.pos.x < 61) {
       this.velocity.x = 0.1;
     } else {
       this.velocity.x = 0;
     }
-    if (this.pos.x > 60 && this.pos.y > 5) {
+    if (this.pos.x === 60 && this.pos.y > 5) {
       this.velocity.y = -0.1;
     } else {
       this.velocity.y = 0;
@@ -592,6 +592,7 @@ let boat,
   boost,
   sparkEmitter,
   hydra,
+  hydra2,
   canSpark = true;
 energyBarColour = new Color(0, 1, 0.5);
 
@@ -609,7 +610,14 @@ function gameInit() {
 ///////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
   hydra ||= new Hydra(vec2(10, 20));
+  let hydraArr = [10];
+  hydra2 ||= new Hydra(vec2(9, 20), hydraArr[0]);
+  // if(Math.floor(hydra.pos.x ) !== hydraArr[0]){
+  //   hydraArr.push(Math.floor(hydra.pos.x ))
+  //   hydraArr.shift()
+  // }
   hydra.moveHydra();
+  hydra2.moveHydra();
   // energyRegain();
   // checkGameOver();
   // boat ||= new Boat(vec2(10, levelSize.y / 2 - 6));
