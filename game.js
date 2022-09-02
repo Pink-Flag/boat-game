@@ -139,7 +139,6 @@ class Enemy extends EngineObject {
   }
   enemySeek() {
     let enemySpeed = Math.random() * (0.004 - 0.0002) + 0.0002;
-
     let attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
     this.angle = Math.atan2(attract.x, attract.y);
     let angleRad = Math.atan2(attract.x, attract.y);
@@ -225,8 +224,12 @@ class Enemy extends EngineObject {
   }
 
   sparks() {
+    let sparkPos = vec2(
+      (this.pos.x += Math.sin(this.angle)),
+      (this.pos.y += Math.cos(this.angle))
+    );
     let sparkEmitter = new ParticleEmitter(
-      this.pos,
+      sparkPos,
       this.angleVelocity,
       1,
       0.5,
@@ -241,7 +244,7 @@ class Enemy extends EngineObject {
       2,
       0.2,
       0.2,
-      0.05,
+      0.2,
       this.angleVelocity, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
       0.99,
       1,
@@ -273,7 +276,6 @@ class Enemy extends EngineObject {
   }
   collideWithBoatDetection() {
     if (isOverlapping(this.pos, vec2(2.5, 4.41), boatPos, vec2(2.5, 4.41))) {
-      console.log("am i in here i don't know");
       energy -= 1;
       this.sparks();
     }
