@@ -47,8 +47,13 @@ class Boat extends EngineObject {
       }
       this.trail(50, 5);
     }
-    if (keyWasPressed(40, 0)) {
-      //down - not in use
+    if (keyWasPressed(38, 0)) {
+      this.velocity.x += Math.sin(this.angle) * speed;
+      this.velocity.y += Math.cos(this.angle) * speed;
+
+      if (energy > 0) {
+        energy -= 1;
+      }
     }
     if (
       (keyWasPressed(37, 0) && keyIsDown(39, 0)) ||
@@ -121,7 +126,7 @@ class Boat extends EngineObject {
 }
 
 class Enemy extends EngineObject {
-  constructor(pos, axis) {
+  constructor(pos, axis, active = false) {
     super(pos, vec2(1.6, 3), 0);
     this.color = new Color(0.8, 0, 0);
     this.setCollision(1, 1);
@@ -130,6 +135,7 @@ class Enemy extends EngineObject {
     this.tileSize = vec2(23, 45);
     this.tileIndex = 0;
     this.renderOrder = 2;
+    this.active = active;
   }
   enemySeek() {
     let enemySpeed = Math.random() * (0.004 - 0.0002) + 0.0002;
@@ -224,7 +230,7 @@ class Enemy extends EngineObject {
       this.angleVelocity,
       1,
       0.5,
-      10,
+      15,
       Math.PI, // pos, angle, emitSize, emitTime, emitRate, emiteCone
       -1,
       vec2(16), // tileIndex, tileSize
@@ -233,8 +239,8 @@ class Enemy extends EngineObject {
       new Color(0.9, 0.9, 0.1, 0),
       new Color(0, 0, 0, 0), // colorEndA, colorEndB
       2,
-      0.1,
-      0.1,
+      0.2,
+      0.2,
       0.05,
       this.angleVelocity, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
       0.99,
@@ -245,31 +251,30 @@ class Enemy extends EngineObject {
       0.1,
       1 // randomness, collide, additive, randomColorLinear, renderOrder
     );
-    sparkEmitter.trailScale = 10;
   }
 
   update() {
     const nextPos = this.pos.x + this.velocity.x;
-    if (
-      nextPos - this.size.x / 2 < 1 ||
-      nextPos + this.size.x / 2 > levelSize.x - 1
-    ) {
-      this.velocity.x *= -0.25;
-    }
-    if (
-      this.pos.y + this.velocity.y > levelSize.y - 1 ||
-      this.pos.y + this.velocity.y < 1
-    ) {
-      this.velocity.y *= -0.25;
+    if (this.active) {
+      if (
+        nextPos - this.size.x / 2 < 1 ||
+        nextPos + this.size.x / 2 > levelSize.x - 1
+      ) {
+        this.velocity.x *= -0.25;
+      }
+      if (
+        this.pos.y + this.velocity.y > levelSize.y - 1 ||
+        this.pos.y + this.velocity.y < 1
+      ) {
+        this.velocity.y *= -0.25;
+      }
     }
     super.update();
   }
   collideWithBoatDetection() {
     if (isOverlapping(this.pos, vec2(2, 3), boatPos, vec2(1.6, 3))) {
       energy -= 1;
-      if (!isGameOver) {
-        this.sparks();
-      }
+      this.sparks();
     }
   }
 }
@@ -364,7 +369,6 @@ class Boost extends EngineObject {
       } else {
         energy = 100;
       }
-      console.log("energy");
     }
   }
 }
@@ -472,6 +476,9 @@ function gameReset() {
   shimmer.emitRate = 15;
   enemy.pos = vec2(levelSize.x - 30, levelSize.y / 2 + 10);
   enemy2.pos = vec2(levelSize.x - 10, levelSize.y / 2 - 15);
+  enemy3.pos = vec2(levelSize.x - 20, levelSize.y / 2 - 25);
+  currentAliveTime = boat.getAliveTime();
+  enemy3.active = false;
   obsticle.pos = vec2(
     Math.random() * (50 - 20) + 10,
     Math.random() * (30 - 10) + 10
@@ -535,6 +542,8 @@ let boat,
   enemy,
   boatPos,
   enemy2,
+  enemy3,
+  currentAliveTime = 0,
   obsticle,
   soul,
   energy = 100,
@@ -576,9 +585,9 @@ function gameUpdate() {
   boost ||= new Boost(vec2(100, 100));
 
   if (
-    boat.getAliveTime() % 30 === 0 &&
+    boat.getAliveTime() - (currentAliveTime % 30) === 0 &&
     !isGameOver &&
-    boat.getAliveTime() > 10
+    boat.getAliveTime() - currentAliveTime > 10
   ) {
     showBoost();
   }
@@ -594,8 +603,9 @@ function gameUpdate() {
   }
 
   if (!enemy) {
-    enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2 + 10), 0);
-    enemy2 = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2 - 15), 1);
+    enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2 + 10), 0, true);
+    enemy2 = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2 - 15), 1, true);
+    enemy3 = new Enemy(vec2(levelSize.x - 20, levelSize.y / 2 - 25), 2);
   }
 
   if (enemy.pos.distance(enemy2.pos) > 10 && !isGameOver) {
@@ -605,6 +615,14 @@ function gameUpdate() {
 
   enemy.collideWithBoatDetection();
   enemy2.collideWithBoatDetection();
+  enemy3.collideWithBoatDetection();
+
+  if (score > 0 && enemy3.pos.y < 0) {
+    enemy3.enemySeek();
+  } else if (score > 0 && enemy3.pos.y > 1) {
+    enemy3.moveEnemy();
+    enemy3.active = true;
+  }
 
   obsticle.tileIndex = -1;
   obsticle.collideWithBoatDetection();
