@@ -225,8 +225,8 @@ class Enemy extends EngineObject {
 
   sparks() {
     let sparkPos = vec2(
-      (this.pos.x += Math.sin(this.angle)),
-      (this.pos.y += Math.cos(this.angle))
+      this.pos.x + Math.sin(this.angle),
+      this.pos.y + Math.cos(this.angle)
     );
     let sparkEmitter = new ParticleEmitter(
       sparkPos,
@@ -277,7 +277,14 @@ class Enemy extends EngineObject {
   collideWithBoatDetection() {
     if (isOverlapping(this.pos, vec2(2.5, 4.41), boatPos, vec2(2.5, 4.41))) {
       energy -= 1;
-      this.sparks();
+      if (canSpark) {
+        this.sparks();
+        canSpark = false;
+      }
+      function flipSpark() {
+        canSpark = true;
+      }
+      setTimeout(flipSpark, 1000);
     }
   }
 }
@@ -559,7 +566,8 @@ let boat,
   moveSpeed,
   cargo = false,
   isGameOver = false,
-  boost;
+  boost,
+  canSpark = true;
 energyBarColour = new Color(0, 1, 0.5);
 
 ///////////////////////////////////////////////////////////////////////////////
