@@ -74,13 +74,13 @@ class Boat extends EngineObject {
       Math.round(Math.abs(this.velocity.x + this.velocity.y * 100) * 10) / 10;
   }
 
-  whirlpool(obsticlePos) {
-    let distance = obsticlePos.distance(this.pos);
+  whirlpool(obstaclePos) {
+    let distance = obstaclePos.distance(this.pos);
     let whirlSpeed = (11 - distance) / 1000;
     if (distance < 8) {
       let attract = vec2(
-        obsticlePos.x - this.pos.x,
-        obsticlePos.y - this.pos.y
+        obstaclePos.x - this.pos.x,
+        obstaclePos.y - this.pos.y
       );
       let angleRad = Math.atan2(attract.x, attract.y);
       this.velocity.x += Math.sin(angleRad) * whirlSpeed;
@@ -272,11 +272,11 @@ class Enemy extends EngineObject {
     super.update();
   }
   collideWithBoatDetection() {
-    // if (isOverlapping(this.pos, vec2(2, 3.91), boatPos, vec2(2, 3.91))) {
-    //   console.log("am i in here i don't know");
-    //   energy -= 1;
-    //   this.sparks();
-    // }
+    if (isOverlapping(this.pos, vec2(2.5, 4.41), boatPos, vec2(2.5, 4.41))) {
+      console.log("am i in here i don't know");
+      energy -= 1;
+      this.sparks();
+    }
   }
 }
 
@@ -480,8 +480,8 @@ function gameReset() {
   enemy3.pos = vec2(levelSize.x - 20, levelSize.y / 2 - 25);
   currentAliveTime = boat.getAliveTime();
   enemy3.active = false;
-  obsticle.xStart = Math.random() * (50 - 20) + 20;
-  obsticle.yStart = Math.random() * (30 - 10) + 10;
+  obstacle.xStart = Math.random() * (50 - 20) + 20;
+  obstacle.yStart = Math.random() * (30 - 10) + 10;
 
   if (cargo) {
     boat.color = new Color(0.9, 0.9, 0.9);
@@ -544,7 +544,7 @@ let boat,
   enemy2,
   enemy3,
   currentAliveTime = 0,
-  obsticle,
+  obstacle,
   soul,
   energy = 100,
   port,
@@ -578,11 +578,9 @@ function gameUpdate() {
 
   boat ||= new Boat(vec2(10, levelSize.y / 2 - 6));
   port ||= new Port(vec2(2, levelSize.y / 2));
-  obsticle ||= new Obstacle(
-    vec2(Math.random() * (50 - 20) + 10, Math.random() * (30 - 10) + 10)
+  obstacle ||= new Obstacle(
+    vec2(Math.random() * (50 - 20) + 15, Math.random() * (30 - 10) + 10)
   );
-  console.log(obsticle.pos);
-
   boost ||= new Boost(vec2(100, 100));
 
   if (
@@ -618,21 +616,21 @@ function gameUpdate() {
   enemy2.collideWithBoatDetection();
   enemy3.collideWithBoatDetection();
 
-  if (score > 0 && enemy3.pos.y < 0) {
+  if (score > 5 && enemy3.pos.y < 0) {
     enemy3.enemySeek();
-  } else if (score > 0 && enemy3.pos.y > 1) {
+  } else if (score > 5 && enemy3.pos.y > 1) {
     enemy3.moveEnemy();
     enemy3.active = true;
   }
 
-  obsticle.tileIndex = -1;
-  obsticle.collideWithBoatDetection();
-  boat.whirlpool(obsticle.pos);
+  obstacle.tileIndex = -1;
+  obstacle.collideWithBoatDetection();
+  boat.whirlpool(obstacle.pos);
 
   if (!isGameOver) {
     boat.moveBoat();
     enemy2.moveEnemy();
-    obsticle.moveObstacle();
+    obstacle.moveObstacle();
     enemy2.trail(3);
     if (moveSpeed > 0.8) {
       boat.trail(moveSpeed);
