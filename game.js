@@ -394,11 +394,11 @@ class SlowEnemy extends Enemy {
   }
   shoot() {
     if (
-      this.pos.distance(boatPos) < 30 &&
+      this.pos.distance(boatPos) < 50 &&
       new Date().getTime() - 5000 > bulletTime
     ) {
       let attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
-      this.angle = Math.atan2(attract.x, attract.y);
+
       let angleRad = Math.atan2(attract.x, attract.y);
       let bulletSpeed = 0.09;
       new Bullet(
@@ -427,18 +427,33 @@ class Bullet extends EngineObject {
   update() {
     // this.angle = Math.atan2(attract.x, attract.y);
 
-    if (boat.getAliveTime() % 0.5 == 0) {
-      let attract = vec2(
-        boatPos.x - this.pos.x / 16,
-        boatPos.y - this.pos.y / 16
-      );
-      let angleRad = Math.atan2(attract.x, attract.y);
+    // if (boat.getAliveTime() % 2 == 0) {
+    //   let attract = vec2(
+    //     boatPos.x - this.pos.x * 0.2,
+    //     boatPos.y - this.pos.y * 0.2
+    //   );
+    //   let angleRad = Math.atan2(attract.x, attract.y);
 
-      this.velocity = vec2(
-        Math.sin(angleRad) * 0.09,
-        Math.cos(angleRad) * 0.09
-      );
+    //   this.velocity.x += Math.sin(angleRad);
+    //   this.velocity.y += Math.cos(angleRad);
+    // }
+    const nextPos = this.pos.x + this.velocity.x;
+
+    if (
+      nextPos - this.size.x / 2 < 1 ||
+      nextPos + this.size.x / 2 > levelSize.x
+    ) {
+      this.sparks();
+      this.destroy();
     }
+    if (
+      this.pos.y + this.velocity.y > levelSize.y ||
+      this.pos.y + this.velocity.y < 1
+    ) {
+      this.sparks();
+      this.destroy();
+    }
+
     super.update();
   }
 
@@ -456,8 +471,41 @@ class Bullet extends EngineObject {
       // o.damage(this.damage, this);
       // o.applyForce(this.velocity.scale(0.1));
       energy -= 20;
+      this.sparks();
       this.destroy();
     }
+  }
+  sparks() {
+    let sparkEmitter = new ParticleEmitter(
+      this.pos,
+      this.angle,
+      1,
+      0.5,
+      20,
+      Math.PI, // pos, angle, emitSize, emitTime, emitRate, emiteCone
+      -1,
+      vec2(16), // tileIndex, tileSize
+      new Color(1, 0, 0),
+      new Color(0, 0, 0), // colorStartA, colorStartB
+      new Color(0.9, 0.9, 0.1, 0),
+      new Color(0, 0, 0, 0), // colorEndA, colorEndB
+      2,
+      0.2,
+      0.2,
+      0.2,
+      this.angle, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
+      0.99,
+      1,
+      1,
+      PI,
+      0.05, // damping, angleDamping, gravityScale, particleCone, fadeRate,
+      0.1,
+      1,
+      0,
+      1,
+      3
+      // randomness, collide, additive, randomColorLinear, renderOrder
+    );
   }
   //   // this.kill();
   //   return 1;
@@ -721,6 +769,7 @@ function gameUpdate() {
   );
   boost ||= new Boost(vec2(100, 100));
   slowEnemy ||= new SlowEnemy(vec2(5, 5));
+
   if (
     boat.getAliveTime() - (currentAliveTime % 30) === 0 &&
     !isGameOver &&
@@ -741,27 +790,27 @@ function gameUpdate() {
     boost.boatCollectBoost();
   }
 
-  if (!enemy) {
-    enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2 + 10), 0, true);
-    enemy2 = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2 - 15), 1, true);
-    enemy3 = new Enemy(vec2(levelSize.x - 20, levelSize.y / 2 - 25), 2);
-  }
+  // if (!enemy) {
+  //   enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2 + 10), 0, true);
+  //   enemy2 = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2 - 15), 1, true);
+  //   enemy3 = new Enemy(vec2(levelSize.x - 20, levelSize.y / 2 - 25), 2);
+  // }
 
-  if (enemy.pos.distance(enemy2.pos) > 10 && !isGameOver) {
-    enemy.moveEnemy();
-    enemy.trail(3);
-  }
+  // if (enemy.pos.distance(enemy2.pos) > 10 && !isGameOver) {
+  //   enemy.moveEnemy();
+  //   enemy.trail(3);
+  // }
 
-  enemy.collideWithBoatDetection();
-  enemy2.collideWithBoatDetection();
-  enemy3.collideWithBoatDetection();
+  // enemy.collideWithBoatDetection();
+  // enemy2.collideWithBoatDetection();
+  // enemy3.collideWithBoatDetection();
 
-  if (score > 5 && enemy3.pos.y < 0) {
-    enemy3.enemySeek();
-  } else if (score > 5 && enemy3.pos.y > 1) {
-    enemy3.moveEnemy();
-    enemy3.active = true;
-  }
+  // if (score > 5 && enemy3.pos.y < 0) {
+  //   enemy3.enemySeek();
+  // } else if (score > 5 && enemy3.pos.y > 1) {
+  //   enemy3.moveEnemy();
+  //   enemy3.active = true;
+  // }
 
   obstacle.tileIndex = -1;
   obstacle.collideWithBoatDetection();
@@ -769,9 +818,9 @@ function gameUpdate() {
 
   if (!isGameOver) {
     boat.moveBoat();
-    enemy2.moveEnemy();
+    // enemy2.moveEnemy();
     obstacle.moveObstacle();
-    enemy2.trail(3);
+    // enemy2.trail(3);
     if (moveSpeed > 0.8) {
       boat.trail(moveSpeed);
     }
