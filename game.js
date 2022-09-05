@@ -141,13 +141,16 @@ class Enemy extends EngineObject {
     speed = Math.random() * (0.004 - 0.0002) + 0.0002,
     slowEnemy = false
   ) {
-    // if (slowEnemy.pos.distance(boatPos) > 15) {
-
     let enemySpeed = speed;
     let attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
     this.angle = Math.atan2(attract.x, attract.y);
     let angleRad = Math.atan2(attract.x, attract.y);
-    if (slowEnemy && this.pos.distance(boatPos) > 15) {
+    if (slowEnemy) {
+      if (this.pos.distance(boatPos) > 15) {
+        this.velocity.x += Math.sin(angleRad) * enemySpeed;
+        this.velocity.y += Math.cos(angleRad) * enemySpeed;
+      }
+    } else {
       this.velocity.x += Math.sin(angleRad) * enemySpeed;
       this.velocity.y += Math.cos(angleRad) * enemySpeed;
     }
@@ -201,7 +204,7 @@ class Enemy extends EngineObject {
     );
     let emitter = new ParticleEmitter(
       trailPos,
-      this.angleVelocity,
+      this.angle,
       1,
       0.5,
       numOfParticles,
@@ -266,7 +269,7 @@ class Enemy extends EngineObject {
   collideWithBoatDetection() {
     if (isOverlapping(this.pos, vec2(2.5, 4.41), boatPos, vec2(2.5, 4.41))) {
       energy -= 1;
-      if (canSpark) {
+      if (canSpark && !isGameOver) {
         this.sparks();
         canSpark = false;
       }
@@ -410,8 +413,6 @@ class SlowEnemy extends Enemy {
       this.pos.distance(boatPos) < 40 &&
       new Date().getTime() - 5000 > bulletTime
     ) {
-      // let attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
-
       let bulletSpeed = 0.09;
       new Bullet(
         this.pos,
@@ -808,7 +809,6 @@ function gameUpdate() {
   }
 
   slowEnemy.collideWithBoatDetection();
-  // slowEnemy.restrictMovement();
   boat.calculateMoveSpeed();
   if (boost) {
     boost.boatCollectBoost();
@@ -824,7 +824,6 @@ function gameUpdate() {
     enemy.moveEnemy();
     enemy.trail(3);
   }
-
   enemy.collideWithBoatDetection();
   enemy2.collideWithBoatDetection();
   enemy3.collideWithBoatDetection();
