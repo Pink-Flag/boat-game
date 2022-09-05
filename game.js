@@ -137,13 +137,20 @@ class Enemy extends EngineObject {
     this.renderOrder = 2;
     this.active = active;
   }
-  enemySeek(speed = Math.random() * (0.004 - 0.0002) + 0.0002) {
+  enemySeek(
+    speed = Math.random() * (0.004 - 0.0002) + 0.0002,
+    slowEnemy = false
+  ) {
+    // if (slowEnemy.pos.distance(boatPos) > 15) {
+
     let enemySpeed = speed;
     let attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
     this.angle = Math.atan2(attract.x, attract.y);
     let angleRad = Math.atan2(attract.x, attract.y);
-    this.velocity.x += Math.sin(angleRad) * enemySpeed;
-    this.velocity.y += Math.cos(angleRad) * enemySpeed;
+    if (slowEnemy && this.pos.distance(boatPos) > 15) {
+      this.velocity.x += Math.sin(angleRad) * enemySpeed;
+      this.velocity.y += Math.cos(angleRad) * enemySpeed;
+    }
   }
   enemyHoldX() {
     if (this.pos.x > 57) {
@@ -270,7 +277,7 @@ class Enemy extends EngineObject {
     }
   }
 
-  update() {
+  restrictMovement() {
     const nextPos = this.pos.x + this.velocity.x;
     if (this.active) {
       if (
@@ -286,6 +293,9 @@ class Enemy extends EngineObject {
         this.velocity.y *= -0.25;
       }
     }
+  }
+  update() {
+    this.restrictMovement();
     super.update();
   }
 }
@@ -391,10 +401,11 @@ class SlowEnemy extends Enemy {
     this.renderOrder = 2;
     this.tileIndex = -1;
     this.speed = 0.1;
+    this.active = true;
   }
   shoot() {
     if (
-      this.pos.distance(boatPos) < 50 &&
+      this.pos.distance(boatPos) < 40 &&
       new Date().getTime() - 5000 > bulletTime
     ) {
       let attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
@@ -407,6 +418,10 @@ class SlowEnemy extends Enemy {
       );
       bulletTime = new Date().getTime();
     }
+  }
+  update() {
+    this.restrictMovement();
+    super.update();
   }
 }
 
@@ -451,6 +466,10 @@ class Bullet extends EngineObject {
       this.pos.y + this.velocity.y < 1
     ) {
       this.sparks();
+      this.destroy();
+    }
+
+    if (isGameOver) {
       this.destroy();
     }
 
@@ -661,6 +680,7 @@ function gameReset() {
   enemy.pos = vec2(levelSize.x - 30, levelSize.y / 2 + 10);
   enemy2.pos = vec2(levelSize.x - 10, levelSize.y / 2 - 15);
   enemy3.pos = vec2(levelSize.x - 20, levelSize.y / 2 - 25);
+  slowEnemy.pos = vec2(60, 30);
   currentAliveTime = boat.getAliveTime();
   enemy3.active = false;
   obstacle.xStart = Math.random() * (50 - 20) + 20;
@@ -768,7 +788,7 @@ function gameUpdate() {
     vec2(Math.random() * (50 - 20) + 15, Math.random() * (30 - 10) + 10)
   );
   boost ||= new Boost(vec2(100, 100));
-  slowEnemy ||= new SlowEnemy(vec2(5, 5));
+  slowEnemy ||= new SlowEnemy(vec2(60, 30));
 
   if (
     boat.getAliveTime() - (currentAliveTime % 30) === 0 &&
@@ -783,8 +803,9 @@ function gameUpdate() {
   }
 
   boatPos = boat.pos;
-  slowEnemy.enemySeek(0.0003);
-  slowEnemy.shoot();
+
+  slowEnemy.collideWithBoatDetection();
+  // slowEnemy.restrictMovement();
   boat.calculateMoveSpeed();
   if (boost) {
     boost.boatCollectBoost();
@@ -817,6 +838,8 @@ function gameUpdate() {
   boat.whirlpool(obstacle.pos);
 
   if (!isGameOver) {
+    slowEnemy.enemySeek(0.0003, true);
+    slowEnemy.shoot();
     boat.moveBoat();
     // enemy2.moveEnemy();
     obstacle.moveObstacle();
