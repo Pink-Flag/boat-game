@@ -137,8 +137,8 @@ class Enemy extends EngineObject {
     this.renderOrder = 2;
     this.active = active;
   }
-  enemySeek() {
-    let enemySpeed = Math.random() * (0.004 - 0.0002) + 0.0002;
+  enemySeek(speed = Math.random() * (0.004 - 0.0002) + 0.0002) {
+    let enemySpeed = speed;
     let attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
     this.angle = Math.atan2(attract.x, attract.y);
     let angleRad = Math.atan2(attract.x, attract.y);
@@ -256,6 +256,20 @@ class Enemy extends EngineObject {
     );
   }
 
+  collideWithBoatDetection() {
+    if (isOverlapping(this.pos, vec2(2.5, 4.41), boatPos, vec2(2.5, 4.41))) {
+      energy -= 1;
+      if (canSpark) {
+        this.sparks();
+        canSpark = false;
+      }
+      function flipSpark() {
+        canSpark = true;
+      }
+      setTimeout(flipSpark, 1000);
+    }
+  }
+
   update() {
     const nextPos = this.pos.x + this.velocity.x;
     if (this.active) {
@@ -273,19 +287,6 @@ class Enemy extends EngineObject {
       }
     }
     super.update();
-  }
-  collideWithBoatDetection() {
-    if (isOverlapping(this.pos, vec2(2.5, 4.41), boatPos, vec2(2.5, 4.41))) {
-      energy -= 1;
-      if (canSpark) {
-        this.sparks();
-        canSpark = false;
-      }
-      function flipSpark() {
-        canSpark = true;
-      }
-      setTimeout(flipSpark, 1000);
-    }
   }
 }
 
@@ -381,6 +382,131 @@ class Boost extends EngineObject {
       }
     }
   }
+}
+
+class SlowEnemy extends Enemy {
+  constructor(pos) {
+    super(pos);
+    this.color = new Color(0.9, 0.9, 0.1);
+    this.renderOrder = 2;
+    this.tileIndex = -1;
+    this.speed = 0.1;
+  }
+  shoot() {
+    if (
+      this.pos.distance(boatPos) < 30 &&
+      new Date().getTime() - 5000 > bulletTime
+    ) {
+      let attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
+      this.angle = Math.atan2(attract.x, attract.y);
+      let angleRad = Math.atan2(attract.x, attract.y);
+      let bulletSpeed = 0.09;
+      new Bullet(
+        this.pos,
+        vec2(Math.sin(angleRad) * bulletSpeed, Math.cos(angleRad) * bulletSpeed)
+      );
+      bulletTime = new Date().getTime();
+    }
+  }
+}
+
+class Bullet extends EngineObject {
+  constructor(pos, velocity) {
+    super(pos, vec2());
+    this.color = new Color(1, 1, 0);
+    this.velocity = velocity;
+
+    this.damping = 1;
+    this.gravityScale = 0;
+    this.renderOrder = 100;
+    this.drawSize = vec2(0.2, 0.2);
+    this.range = 2;
+    this.setCollision(1);
+  }
+
+  update() {
+    // this.angle = Math.atan2(attract.x, attract.y);
+
+    if (boat.getAliveTime() % 0.5 == 0) {
+      let attract = vec2(
+        boatPos.x - this.pos.x / 16,
+        boatPos.y - this.pos.y / 16
+      );
+      let angleRad = Math.atan2(attract.x, attract.y);
+
+      this.velocity = vec2(
+        Math.sin(angleRad) * 0.09,
+        Math.cos(angleRad) * 0.09
+      );
+    }
+    super.update();
+  }
+
+  //   engineObjectsCallback(this.pos, this.size, (o) => {
+  //     if (o.isGameObject) this.collideWithObject(o);
+  //   });
+
+  //   this.angle = this.velocity.angle();
+  //   this.range -= this.velocity.length();
+  //   // if (this.range < 0) this.kill();
+  // }
+
+  collideWithObject(o) {
+    if (o === boat) {
+      // o.damage(this.damage, this);
+      // o.applyForce(this.velocity.scale(0.1));
+      energy -= 20;
+      this.destroy();
+    }
+  }
+  //   // this.kill();
+  //   return 1;
+  // }
+
+  // collideWithTile(data, pos) {
+  //   if (data <= 0) return 0;
+
+  //   destroyTile(pos);
+  //   // this.kill();
+  //   return 1;
+  // }
+
+  // kill() {
+  //   if (this.destroyed) return;
+  //   this.destroy();
+
+  //   // spark effects
+  //   const emitter = new ParticleEmitter(
+  //     this.pos,
+  //     0,
+  //     0,
+  //     0.1,
+  //     100,
+  //     0.5, // pos, angle, emitSize, emitTime, emitRate, emiteCone
+  //     undefined,
+  //     undefined, // tileIndex, tileSize
+  //     new Color(1, 1, 0),
+  //     new Color(1, 0, 0), // colorStartA, colorStartB
+  //     new Color(1, 1, 0),
+  //     new Color(1, 0, 0), // colorEndA, colorEndB
+  //     0.2,
+  //     0.2,
+  //     0,
+  //     0.1,
+  //     0.1, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
+  //     1,
+  //     1,
+  //     0.5,
+  //     PI,
+  //     0.1, // damping, angleDamping, gravityScale, particleCone, fadeRate,
+  //     0.5,
+  //     1,
+  //     1 // randomness, collide, additive, randomColorLinear, renderOrder
+  //   );
+  //   emitter.trailScale = 1;
+  //   emitter.elasticity = 0.3;
+  //   // emitter.angle = this.velocity.angle() + PI;
+  // }
 }
 
 function energyRegain() {
@@ -543,7 +669,7 @@ function createShimmer() {
 }
 ("use strict");
 
-// game variables
+// game global variables
 let boat,
   levelSize,
   angle,
@@ -551,6 +677,7 @@ let boat,
   enemy,
   boatPos,
   enemy2,
+  bulletTime = 5000,
   enemy3,
   currentAliveTime = 0,
   obstacle,
@@ -558,6 +685,7 @@ let boat,
   energy = 100,
   port,
   shimmer,
+  slowEnemy,
   score = 0,
   speed = 0.3,
   technicalArea,
@@ -592,7 +720,7 @@ function gameUpdate() {
     vec2(Math.random() * (50 - 20) + 15, Math.random() * (30 - 10) + 10)
   );
   boost ||= new Boost(vec2(100, 100));
-
+  slowEnemy ||= new SlowEnemy(vec2(5, 5));
   if (
     boat.getAliveTime() - (currentAliveTime % 30) === 0 &&
     !isGameOver &&
@@ -606,6 +734,8 @@ function gameUpdate() {
   }
 
   boatPos = boat.pos;
+  slowEnemy.enemySeek(0.0003);
+  slowEnemy.shoot();
   boat.calculateMoveSpeed();
   if (boost) {
     boost.boatCollectBoost();
