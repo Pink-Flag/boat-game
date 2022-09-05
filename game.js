@@ -402,19 +402,23 @@ class SlowEnemy extends Enemy {
     this.tileIndex = -1;
     this.speed = 0.1;
     this.active = true;
+    this.attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
+    this.angle = Math.atan2(this.attract.x, this.attract.y);
   }
   shoot() {
     if (
       this.pos.distance(boatPos) < 40 &&
       new Date().getTime() - 5000 > bulletTime
     ) {
-      let attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
+      // let attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
 
-      let angleRad = Math.atan2(attract.x, attract.y);
       let bulletSpeed = 0.09;
       new Bullet(
         this.pos,
-        vec2(Math.sin(angleRad) * bulletSpeed, Math.cos(angleRad) * bulletSpeed)
+        vec2(
+          Math.sin(this.angle) * bulletSpeed,
+          Math.cos(this.angle) * bulletSpeed
+        )
       );
       bulletTime = new Date().getTime();
     }
@@ -783,6 +787,7 @@ function gameUpdate() {
   checkGameOver();
 
   boat ||= new Boat(vec2(10, levelSize.y / 2 - 6));
+  boatPos = boat.pos;
   port ||= new Port(vec2(2, levelSize.y / 2));
   obstacle ||= new Obstacle(
     vec2(Math.random() * (50 - 20) + 15, Math.random() * (30 - 10) + 10)
@@ -791,7 +796,7 @@ function gameUpdate() {
   slowEnemy ||= new SlowEnemy(vec2(60, 30));
 
   if (
-    boat.getAliveTime() - (currentAliveTime % 30) === 0 &&
+    (boat.getAliveTime() - currentAliveTime) % 30 === 0 &&
     !isGameOver &&
     boat.getAliveTime() - currentAliveTime > 10
   ) {
@@ -802,8 +807,6 @@ function gameUpdate() {
     createSoul();
   }
 
-  boatPos = boat.pos;
-
   slowEnemy.collideWithBoatDetection();
   // slowEnemy.restrictMovement();
   boat.calculateMoveSpeed();
@@ -811,27 +814,27 @@ function gameUpdate() {
     boost.boatCollectBoost();
   }
 
-  // if (!enemy) {
-  //   enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2 + 10), 0, true);
-  //   enemy2 = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2 - 15), 1, true);
-  //   enemy3 = new Enemy(vec2(levelSize.x - 20, levelSize.y / 2 - 25), 2);
-  // }
+  if (!enemy) {
+    enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2 + 10), 0, true);
+    enemy2 = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2 - 15), 1, true);
+    enemy3 = new Enemy(vec2(levelSize.x - 20, levelSize.y / 2 - 25), 2);
+  }
 
-  // if (enemy.pos.distance(enemy2.pos) > 10 && !isGameOver) {
-  //   enemy.moveEnemy();
-  //   enemy.trail(3);
-  // }
+  if (enemy.pos.distance(enemy2.pos) > 10 && !isGameOver) {
+    enemy.moveEnemy();
+    enemy.trail(3);
+  }
 
-  // enemy.collideWithBoatDetection();
-  // enemy2.collideWithBoatDetection();
-  // enemy3.collideWithBoatDetection();
+  enemy.collideWithBoatDetection();
+  enemy2.collideWithBoatDetection();
+  enemy3.collideWithBoatDetection();
 
-  // if (score > 5 && enemy3.pos.y < 0) {
-  //   enemy3.enemySeek();
-  // } else if (score > 5 && enemy3.pos.y > 1) {
-  //   enemy3.moveEnemy();
-  //   enemy3.active = true;
-  // }
+  if (score > 5 && enemy3.pos.y < 0) {
+    enemy3.enemySeek();
+  } else if (score > 5 && enemy3.pos.y > 1) {
+    enemy3.moveEnemy();
+    enemy3.active = true;
+  }
 
   obstacle.tileIndex = -1;
   obstacle.collideWithBoatDetection();
@@ -840,10 +843,11 @@ function gameUpdate() {
   if (!isGameOver) {
     slowEnemy.enemySeek(0.0003, true);
     slowEnemy.shoot();
+    slowEnemy.trail(3);
     boat.moveBoat();
-    // enemy2.moveEnemy();
+    enemy2.moveEnemy();
     obstacle.moveObstacle();
-    // enemy2.trail(3);
+    enemy2.trail(3);
     if (moveSpeed > 0.8) {
       boat.trail(moveSpeed);
     }
