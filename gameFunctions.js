@@ -100,8 +100,8 @@ function gameReset() {
   boat.angle = 0;
   shimmer.emitRate = 15;
   enemy.pos = vec2(levelSize.x - 30, levelSize.y / 2 + 10);
-  enemy2.pos = vec2(levelSize.x - 10, levelSize.y / 2 - 15);
-  enemy3.pos = vec2(levelSize.x - 20, levelSize.y / 2 - 25);
+  enemy2.pos = vec2(22, -22);
+  enemy3.pos = vec2(10, -27);
   slowEnemy.pos = vec2(60, 30);
   currentAliveTime = boat.getAliveTime();
   enemy3.active = false;
