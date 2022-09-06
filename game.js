@@ -194,14 +194,21 @@ function gameRenderPost() {
   if (!isGameOver && startGame) {
     createShimmer();
     drawTextScreen(
-      score,
-      vec2(overlayCanvas.width / 2, 80),
-      80,
+      `Score : ${score}`,
+      vec2(overlayCanvas.width / 2 - 420, 20),
+      35,
       new Color(),
-      9
+      6
+    );
+    drawTextScreen(
+      " Energy :",
+      vec2(overlayCanvas.width / 2 + 120, 20),
+      35,
+      new Color(),
+      6
     );
     let energybar = vec2(energy / 6, 1);
-    drawRect(vec2(50 + energy / 12, 38), energybar, energyBarColour, 0, 0);
+    drawRect(vec2(50 + energy / 12, 41), energybar, energyBarColour, 0, 0);
   } else {
     drawRect(cameraPos, levelSize, new Color(0.21, 0.21, 0.21), 0, 0);
   }
