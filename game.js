@@ -197,7 +197,7 @@ class Enemy extends EngineObject {
       }
     }
   }
-  trail(numOfParticles) {
+  trail(numOfParticles, trailVelocity = 0.05) {
     let trailPos = vec2(
       this.pos.x - this.velocity.x,
       this.pos.y - this.velocity.y
@@ -218,7 +218,7 @@ class Enemy extends EngineObject {
       2,
       0.07,
       0.07,
-      0.05,
+      trailVelocity,
       this.angleVelocity, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
       0.99,
       1,
@@ -840,9 +840,9 @@ function gameUpdate() {
   boat.whirlpool(obstacle.pos);
 
   if (!isGameOver) {
-    slowEnemy.enemySeek(0.0003, true);
+    slowEnemy.enemySeek(0.0003, false);
     slowEnemy.shoot();
-    slowEnemy.trail(3);
+    slowEnemy.trail(3, -0.05);
     boat.moveBoat();
     enemy2.moveEnemy();
     obstacle.moveObstacle();
