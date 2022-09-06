@@ -128,7 +128,7 @@ class Boat extends EngineObject {
 //////////////////////////////////////////////////////////////
 
 class Enemy extends EngineObject {
-  constructor(pos, axis, active = false) {
+  constructor(pos, axis, active = false, home) {
     super(pos, vec2(2, 3.91), 0);
     this.color = new Color(0.8, 0, 0);
     this.setCollision(1, 1, 1);
@@ -138,6 +138,14 @@ class Enemy extends EngineObject {
     this.tileIndex = 0;
     this.renderOrder = 2;
     this.active = active;
+    this.home = home;
+    this.isHome = false;
+  }
+  seekHome() {
+    let attract = vec2(this.home.x - this.pos.x, this.home.y - this.pos.y);
+    this.angle = Math.atan2(attract.x, attract.y);
+    this.velocity.x += Math.sin(this.angle) * 0.001;
+    this.velocity.y += Math.cos(this.angle) * 0.001;
   }
   enemySeek(
     speed = Math.random() * (0.004 - 0.0002) + 0.0002,
@@ -330,7 +338,6 @@ class Obstacle extends EngineObject {
     }
   }
   scoreCheck() {
-    console.log(obstacleIsHome);
     if (
       (score >= 3 && score < 6) ||
       (score >= 9 && score < 12) ||

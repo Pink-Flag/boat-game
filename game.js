@@ -20,6 +20,8 @@ let boat,
   speed = 0.3,
   technicalArea,
   obstacleIsHome = false,
+  enemy2IsHome = false,
+  enemy3IsHome = false,
   pos1,
   pos2,
   moveSpeed,
@@ -73,12 +75,29 @@ function gameUpdate() {
     boost.boatCollectBoost();
   }
 
-  // if (!enemy) {
-  //   enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2 + 10), 0, true);
-  //   enemy2 = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2 - 15), 1, true);
-  //   enemy3 = new Enemy(vec2(levelSize.x - 20, levelSize.y / 2 - 25), 2);
-  // }
+  if (!enemy2) {
+    // enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2 + 10), 0, true);
+    enemy2 = new Enemy(
+      vec2(22, -22),
+      1,
+      false,
+      vec2(levelSize.x - 10, levelSize.y / 2 - 15)
+    );
+    // enemy3 = new Enemy(vec2(levelSize.x - 20, levelSize.y / 2 - 25), 2, false);
+  }
 
+  if (score >= 1) {
+    if (enemy2.isHome === false) {
+      enemy2.seekHome();
+    }
+    if (enemy2.pos.distance(enemy2.home) < 1) {
+      enemy2.isHome = true;
+    }
+    if (enemy2.isHome) {
+      enemy2.moveEnemy();
+    }
+  }
+  console.log(enemy2.pos);
   // if (enemy.pos.distance(enemy2.pos) > 10 && !isGameOver) {
   //   enemy.moveEnemy();
   //   enemy.trail(3);
@@ -105,7 +124,7 @@ function gameUpdate() {
     obstacle.scoreCheck();
     // enemy2.moveEnemy();
     // obstacle.moveObstacle();
-    // enemy2.trail(3);
+    enemy2.trail(3);
     if (moveSpeed > 0.8) {
       boat.trail(moveSpeed);
     }
