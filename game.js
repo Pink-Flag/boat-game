@@ -26,6 +26,7 @@ let boat,
   pos1,
   pos2,
   moveSpeed,
+  secondScreen = false,
   cargo = false,
   isGameOver = false,
   boost,
@@ -39,7 +40,6 @@ function gameInit() {
   canvasFixedSize = vec2(1280, 720);
   levelSize = vec2(72, 40);
   cameraPos = levelSize.scale(0.5);
-  // createShimmer();
   initTileCollision(vec2(5, 5));
   const tileLayer = new TileLayer(vec2(), undefined, 64);
 }
@@ -47,10 +47,20 @@ function gameInit() {
 ///////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
   if (!startGame) {
-    introScreen();
+    if (!secondScreen) {
+      introScreen();
+    }
+    if (keyWasReleased(32, 0)) {
+      secondScreen = true;
+    }
+    if (secondScreen) {
+      controllsScreen();
+    }
 
-    if (keyWasPressed(32, 0)) {
-      startGame = true;
+    if (secondScreen) {
+      if (keyWasPressed(32, 0)) {
+        startGame = true;
+      }
     }
   } else {
     energyRegain();
@@ -182,7 +192,7 @@ function gameRender() {
 function gameRenderPost() {
   // draw to overlay canvas for hud rendering
   if (!isGameOver && startGame) {
-    createShimmer()
+    createShimmer();
     drawTextScreen(
       score,
       vec2(overlayCanvas.width / 2, 80),

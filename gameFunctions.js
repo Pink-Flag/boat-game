@@ -94,11 +94,77 @@ function collectSoul() {
 
 function introScreen() {
   drawTextScreen(
-    "GAME OVpppER",
-    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.33),
+    "River of Woe",
+    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.2),
     100,
     new Color(),
     12
+  );
+  drawTextScreen(
+    "You are Charon, the ferryman of Hades, who needs to carry the souls",
+    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.4),
+    35,
+    new Color(),
+    6
+  );
+  drawTextScreen(
+    "of the newly deceased who had received the rites of burial across",
+    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.48),
+    35,
+    new Color(),
+    6
+  );
+  drawTextScreen(
+    "the river Acheron that devides the world of the living from the ",
+    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.56),
+    35,
+    new Color(),
+    6
+  );
+  drawTextScreen(
+    "world of the dead.",
+    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.64),
+    35,
+    new Color(),
+    6
+  );
+  drawTextScreen(
+    "press space to continue.",
+    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.84),
+    30,
+    new Color(),
+    6
+  );
+}
+function controllsScreen() {
+  drawTextScreen(
+    "- press left arrow + right arrow to row forward",
+    vec2(overlayCanvas.width / 2 - 50, overlayCanvas.height * 0.3),
+    40,
+    new Color(),
+    6
+  );
+  drawTextScreen(
+    "- press left arrow to turn left",
+    vec2(overlayCanvas.width / 2 - 205, overlayCanvas.height * 0.4),
+    40,
+    new Color(),
+    6
+  );
+  drawTextScreen(
+    "- press right arrow to turn right",
+    vec2(overlayCanvas.width / 2 - 180, overlayCanvas.height * 0.5),
+    40,
+    new Color(),
+    6
+  );
+
+  drawTextScreen(
+    "press space to continue.",
+    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.84),
+    30,
+    new Color(),
+    6
   );
 }
 
