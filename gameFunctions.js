@@ -79,14 +79,16 @@ function dockSoul() {
         energy = 100;
       }
       score++;
+      sound_dock.play(1, 0);
       createSoul();
     }
     cargo = false;
   }
 }
 function collectSoul() {
-  if (isOverlapping(boatPos, vec2(1, 3), soul.pos, vec2(2, 2))) {
+  if (isOverlapping(boatPos, vec2(1, 3), soul.pos, vec2(2, 2)) && !cargo) {
     soul.destroy();
+    sound_collect.play(1, 0);
     cargo = true;
     boat.color = new Color(0.9, 0.9, 0.1);
   }

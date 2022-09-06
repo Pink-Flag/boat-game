@@ -38,6 +38,7 @@ class Boat extends EngineObject {
         energy -= 0.5;
       }
       this.trail(50, 5);
+      sound_siderow.play();
     }
     if (keyWasPressed(39, 0)) {
       //right
@@ -46,6 +47,7 @@ class Boat extends EngineObject {
         energy -= 0.5;
       }
       this.trail(50, 5);
+      sound_siderow.play();
     }
     if (keyWasPressed(38, 0)) {
       this.velocity.x += Math.sin(this.angle) * speed;
@@ -62,7 +64,7 @@ class Boat extends EngineObject {
       //up
       this.velocity.x += Math.sin(this.angle) * speed;
       this.velocity.y += Math.cos(this.angle) * speed;
-
+      sound_row.play();
       if (energy > 0) {
         energy -= 1;
       }
@@ -277,6 +279,9 @@ class Enemy extends EngineObject {
 
   collideWithBoatDetection() {
     if (isOverlapping(this.pos, vec2(2.5, 4.41), boatPos, vec2(2.5, 4.41))) {
+      if (!isGameOver) {
+        sound_crash.play();
+      }
       energy -= 1;
       if (canSpark && !isGameOver) {
         this.sparks();
@@ -489,6 +494,7 @@ class SlowEnemy extends Enemy {
           Math.cos(this.angle) * bulletSpeed
         )
       );
+      sound_shoot.play();
       bulletTime = new Date().getTime();
     }
   }
@@ -522,6 +528,7 @@ class Bullet extends EngineObject {
       nextPos + this.size.x / 2 > levelSize.x
     ) {
       this.sparks();
+      sound_explosion.play();
       this.destroy();
     }
     if (
@@ -529,6 +536,7 @@ class Bullet extends EngineObject {
       this.pos.y + this.velocity.y < 1
     ) {
       this.sparks();
+      sound_explosion.play();
       this.destroy();
     }
 
@@ -544,6 +552,7 @@ class Bullet extends EngineObject {
       let bulletDistance = slowEnemyPos.distance(boatPos) / 10;
       energy -= 21 - 3 * bulletDistance;
       this.sparks();
+      sound_explosion.play();
       this.destroy();
     }
   }
