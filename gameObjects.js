@@ -556,6 +556,7 @@ class Bullet extends EngineObject {
       this.destroy();
     } else if ([enemy, enemy2, enemy3, obstacle].includes(o)) {
       this.sparks();
+      sound_explosion.play();
       this.destroy();
     }
   }
