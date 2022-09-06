@@ -92,6 +92,16 @@ function collectSoul() {
   }
 }
 
+function introScreen() {
+  drawTextScreen(
+    "GAME OVpppER",
+    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.33),
+    100,
+    new Color(),
+    12
+  );
+}
+
 function gameReset() {
   isGameOver = false;
   energy = 100;
@@ -130,8 +140,8 @@ function createShimmer() {
     vec2(36, 20),
     0,
     vec2(72, 40),
-    0,
-    15,
+    1,
+    0.5,
     PI, // pos, angle, emitSize, emitTime, emitRate, emiteCone
     -1,
     vec2(16), // tileIndex, tileSize
