@@ -125,6 +125,8 @@ class Boat extends EngineObject {
   }
 }
 
+//////////////////////////////////////////////////////////////
+
 class Enemy extends EngineObject {
   constructor(pos, axis, active = false) {
     super(pos, vec2(2, 3.91), 0);
@@ -302,26 +304,78 @@ class Enemy extends EngineObject {
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+
 class Obstacle extends EngineObject {
-  constructor(pos) {
+  constructor(pos, home) {
     super(pos, vec2(1), 0);
     this.color = new Color(0.1, 0.9, 0.1);
     this.setCollision(0, 0);
-    this.xStart = this.pos.x;
-    this.yStart = this.pos.y;
+    this.start = home;
+    this.offCanvas = pos;
     this.t = 0;
     this.dt = Math.PI / 1000;
     this.xrad = 15;
     this.yrad = 10;
     this.renderOrder = -1;
+    this.home = home;
+    this.speed = 0.001;
   }
   moveObstacle() {
-    this.pos.x = this.xStart + this.xrad * Math.sin(this.t + Math.PI / 2);
-    this.pos.y = this.yStart + this.yrad * Math.sin(2 * this.t);
+    this.pos.x = this.start.x + this.xrad * Math.sin(this.t + Math.PI / 2);
+    this.pos.y = this.start.y + this.yrad * Math.sin(2 * this.t);
     this.t += this.dt;
     if (this.t >= 2 * Math.PI) {
       this.t -= 2 * Math.PI;
     }
+  }
+  scoreCheck() {
+    console.log(obstacleIsHome);
+    if (
+      (score >= 3 && score < 6) ||
+      (score >= 9 && score < 12) ||
+      score >= 15
+    ) {
+      if (!obstacleIsHome) {
+        this.seekHome();
+      }
+
+      if (this.pos.distance(vec2(this.home.x + 15, this.home.y)) < 1) {
+        obstacleIsHome = true;
+      }
+
+      if (obstacleIsHome) {
+        this.moveObstacle();
+      }
+    } else {
+      this.obstacleOffCanvas();
+    }
+  }
+  obstacleOffCanvas() {
+    if (this.pos.distance(this.offCanvas) > 1) {
+      let attract = vec2(
+        this.offCanvas.x - this.pos.x,
+        this.offCanvas.y - this.pos.y
+      );
+      this.angle = Math.atan2(attract.x, attract.y);
+
+      this.velocity.x += Math.sin(this.angle) * this.speed;
+      this.velocity.y += Math.cos(this.angle) * this.speed;
+    } else {
+      obstacleIsHome = false;
+      this.t = 0;
+
+      this.xrad = 15;
+      this.yrad = 10;
+    }
+  }
+
+  seekHome() {
+    let attract = vec2(this.home.x + 15 - this.pos.x, this.home.y - this.pos.y);
+    this.angle = Math.atan2(attract.x, attract.y);
+
+    this.velocity.x += Math.sin(this.angle) * this.speed;
+    this.velocity.y += Math.cos(this.angle) * this.speed;
   }
   whirl() {
     let emitter = new ParticleEmitter(
@@ -359,6 +413,8 @@ class Obstacle extends EngineObject {
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+
 class Soul extends EngineObject {
   constructor(pos) {
     super(pos, vec2(2, 2), 0);
@@ -368,6 +424,8 @@ class Soul extends EngineObject {
   }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+
 class Port extends EngineObject {
   constructor(pos) {
     super(pos, vec2(2, 4), 0);
@@ -376,6 +434,8 @@ class Port extends EngineObject {
     this.tileIndex = -1;
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////
 
 class Boost extends EngineObject {
   constructor(pos) {
@@ -395,6 +455,8 @@ class Boost extends EngineObject {
     }
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////
 
 class SlowEnemy extends Enemy {
   constructor(pos) {
@@ -428,6 +490,8 @@ class SlowEnemy extends Enemy {
     super.update();
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////
 
 class Bullet extends EngineObject {
   constructor(pos, velocity) {

@@ -19,6 +19,7 @@ let boat,
   score = 0,
   speed = 0.3,
   technicalArea,
+  obstacleIsHome = false,
   pos1,
   pos2,
   moveSpeed,
@@ -48,6 +49,7 @@ function gameUpdate() {
   boatPos = boat.pos;
   port ||= new Port(vec2(2, levelSize.y / 2));
   obstacle ||= new Obstacle(
+    vec2(20, -20),
     vec2(Math.random() * (50 - 20) + 15, Math.random() * (30 - 10) + 10)
   );
   boost ||= new Boost(vec2(100, 100));
@@ -71,38 +73,39 @@ function gameUpdate() {
     boost.boatCollectBoost();
   }
 
-  if (!enemy) {
-    enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2 + 10), 0, true);
-    enemy2 = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2 - 15), 1, true);
-    enemy3 = new Enemy(vec2(levelSize.x - 20, levelSize.y / 2 - 25), 2);
-  }
+  // if (!enemy) {
+  //   enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2 + 10), 0, true);
+  //   enemy2 = new Enemy(vec2(levelSize.x - 10, levelSize.y / 2 - 15), 1, true);
+  //   enemy3 = new Enemy(vec2(levelSize.x - 20, levelSize.y / 2 - 25), 2);
+  // }
 
-  if (enemy.pos.distance(enemy2.pos) > 10 && !isGameOver) {
-    enemy.moveEnemy();
-    enemy.trail(3);
-  }
-  enemy.collideWithBoatDetection();
-  enemy2.collideWithBoatDetection();
-  enemy3.collideWithBoatDetection();
+  // if (enemy.pos.distance(enemy2.pos) > 10 && !isGameOver) {
+  //   enemy.moveEnemy();
+  //   enemy.trail(3);
+  // }
+  // enemy.collideWithBoatDetection();
+  // enemy2.collideWithBoatDetection();
+  // enemy3.collideWithBoatDetection();
 
   obstacle.tileIndex = -1;
   obstacle.collideWithBoatDetection();
   boat.whirlpool(obstacle.pos);
 
   if (!isGameOver) {
-    if (score > 5 && enemy3.pos.y < 0) {
-      enemy3.enemySeek();
-    } else if (score > 5 && enemy3.pos.y > 1) {
-      enemy3.moveEnemy();
-      enemy3.active = true;
-    }
-    slowEnemy.enemySeek(0.0003, false);
-    slowEnemy.shoot();
-    slowEnemy.trail(3, -0.05);
+    // if (score > 5 && enemy3.pos.y < 0) {
+    //   enemy3.enemySeek();
+    // } else if (score > 5 && enemy3.pos.y > 1) {
+    //   enemy3.moveEnemy();
+    //   enemy3.active = true;
+    // }
+    // slowEnemy.enemySeek(0.0003, false);
+    // slowEnemy.shoot();
+    // slowEnemy.trail(3, -0.05);
     boat.moveBoat();
-    enemy2.moveEnemy();
-    obstacle.moveObstacle();
-    enemy2.trail(3);
+    obstacle.scoreCheck();
+    // enemy2.moveEnemy();
+    // obstacle.moveObstacle();
+    // enemy2.trail(3);
     if (moveSpeed > 0.8) {
       boat.trail(moveSpeed);
     }
