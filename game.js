@@ -828,18 +828,17 @@ function gameUpdate() {
   enemy2.collideWithBoatDetection();
   enemy3.collideWithBoatDetection();
 
-  if (score > 5 && enemy3.pos.y < 0) {
-    enemy3.enemySeek();
-  } else if (score > 5 && enemy3.pos.y > 1) {
-    enemy3.moveEnemy();
-    enemy3.active = true;
-  }
-
   obstacle.tileIndex = -1;
   obstacle.collideWithBoatDetection();
   boat.whirlpool(obstacle.pos);
 
   if (!isGameOver) {
+    if (score > 5 && enemy3.pos.y < 0) {
+      enemy3.enemySeek();
+    } else if (score > 5 && enemy3.pos.y > 1) {
+      enemy3.moveEnemy();
+      enemy3.active = true;
+    }
     slowEnemy.enemySeek(0.0003, false);
     slowEnemy.shoot();
     slowEnemy.trail(3, -0.05);
