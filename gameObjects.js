@@ -545,8 +545,12 @@ class Bullet extends EngineObject {
       energy -= 21 - 3 * bulletDistance;
       this.sparks();
       this.destroy();
+    } else if ([enemy, enemy2, enemy3, obstacle].includes(o)) {
+      this.sparks();
+      this.destroy();
     }
   }
+
   sparks() {
     let sparkEmitter = new ParticleEmitter(
       this.pos,
