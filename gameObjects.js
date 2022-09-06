@@ -509,7 +509,7 @@ class Bullet extends EngineObject {
     this.damping = 1;
     this.gravityScale = 0;
     this.renderOrder = 100;
-    this.drawSize = vec2(0.2, 0.2);
+    this.drawSize = vec2(0.5, 0.5);
     this.range = 2;
     this.setCollision(1);
   }
@@ -541,7 +541,8 @@ class Bullet extends EngineObject {
 
   collideWithObject(o) {
     if (o === boat) {
-      energy -= 20;
+      let bulletDistance = slowEnemyPos.distance(boatPos) / 10;
+      energy -= 21 - 3 * bulletDistance;
       this.sparks();
       this.destroy();
     }

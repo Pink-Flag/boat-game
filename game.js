@@ -28,8 +28,9 @@ let boat,
   cargo = false,
   isGameOver = false,
   boost,
-  canSpark = true;
-energyBarColour = new Color(0, 1, 0.5);
+  canSpark = true,
+  slowEnemyPos,
+  energyBarColour = new Color(0, 1, 0.5);
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameInit() {
@@ -56,6 +57,7 @@ function gameUpdate() {
   );
   boost ||= new Boost(vec2(100, 100));
   slowEnemy ||= new SlowEnemy(vec2(60, 30));
+  slowEnemyPos = slowEnemy.pos;
 
   if (
     (boat.getAliveTime() - currentAliveTime) % 30 === 0 &&
@@ -91,7 +93,6 @@ function gameUpdate() {
     );
   }
 
-  console.log(enemy3.pos);
   if (enemy.pos.distance(enemy2.pos) > 10 && !isGameOver) {
     enemy.moveEnemy();
     enemy.trail(3);
@@ -130,19 +131,13 @@ function gameUpdate() {
         enemy3.active = true;
       }
     }
-    // if (score > 5 && enemy3.pos.y < 0) {
-    //   enemy3.enemySeek();
-    // } else if (score > 5 && enemy3.pos.y > 1) {
-    //   enemy3.moveEnemy();
-    //   enemy3.active = true;
-    // }
+
     slowEnemy.enemySeek(0.0003, false);
     slowEnemy.shoot();
     slowEnemy.trail(3, -0.05);
     boat.moveBoat();
     obstacle.scoreCheck();
 
-    // obstacle.moveObstacle();
     enemy2.trail(3);
     if (moveSpeed > 0.8) {
       boat.trail(moveSpeed);
