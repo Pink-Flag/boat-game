@@ -441,11 +441,12 @@ class Soul extends EngineObject {
 ////////////////////////////////////////////////////////////////////////////////////////
 
 class SoulQueue extends EngineObject {
-  constructor(pos) {
+  constructor(pos, color) {
     super(pos, vec2(1, 1), 0);
-    this.color = new Color(0.9, 0.9, 0.1);
+    this.color = color;
     this.renderOrder = 2;
     this.tileIndex = -1;
+    this.startPos = pos;
   }
 
   seekDock() {
@@ -458,8 +459,16 @@ class SoulQueue extends EngineObject {
     }
     if (dockPos.distance(this.pos) < 1) {
       soulAtDock = true;
+     
     }
-    
+    // queue[1].velocity.y = 4
+  }
+  nextInLine(pos) {
+    speed = 0.0001;
+    let attract = vec2(pos.x - this.pos.x, pos.y - this.pos.y);
+    this.angle = Math.atan2(attract.x, attract.y);
+    this.velocity.x += Math.sin(this.angle) * speed;
+    this.velocity.y += Math.cos(this.angle) * speed;
   }
 }
 

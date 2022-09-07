@@ -23,8 +23,7 @@ let boat,
   enemy2IsHome = false,
   enemy3IsHome = false,
   startGame = false,
-  pos1,
-  pos2,
+  positions = [vec2(75, 16), vec2(75, 12), vec2(75, 8)],
   moveSpeed,
   secondScreen = false,
   cargo = false,
@@ -119,9 +118,9 @@ function gameUpdate() {
       enemy.moveEnemy();
       enemy.trail(3);
     }
-    enemy.collideWithBoatDetection();
-    enemy2.collideWithBoatDetection();
-    enemy3.collideWithBoatDetection();
+    // enemy.collideWithBoatDetection();
+    // enemy2.collideWithBoatDetection();
+    // enemy3.collideWithBoatDetection();
 
     obstacle.tileIndex = -1;
     obstacle.collideWithBoatDetection();
@@ -174,16 +173,19 @@ function gameUpdate() {
     collectSoul();
 
     if (queue.length === 0) {
-      queue.push(new SoulQueue(vec2(75, 16)));
-      queue.push(new SoulQueue(vec2(75, 12)));
-      queue.push(new SoulQueue(vec2(75, 8)));
+      queue.push(new SoulQueue(vec2(75, 16), new Color(0.9, 0.9, 0.9)));
+      queue.push(new SoulQueue(vec2(75, 12), new Color(0.9, 0, 0)));
+      queue.push(new SoulQueue(vec2(75, 8), new Color(0, 0.9, 0.9)));
     }
 
+    // queue[0] = new SoulQueue(pos1);
+    // queue[1] = new SoulQueue(pos2);
+    // queue[2] = new SoulQueue(pos3);
+    // console.log(queue);
     if (!soulAtDock) {
       queue[0].seekDock();
     }
-
-    console.log(queue[0]);
+    console.log(queue);
 
     energyCheck();
     boat.tileIndex = 0;

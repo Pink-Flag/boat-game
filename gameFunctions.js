@@ -83,20 +83,27 @@ function dockSoul() {
       score++;
       sound_dock.play(1, 0);
       createSoul();
-      soulAtDock = false
+      soulAtDock = false;
       // queue[0].seekDock();
     }
     cargo = false;
   }
 }
 function collectSoul() {
-  if (isOverlapping(boatPos, vec2(1, 3), soul.pos, vec2(2, 2)) && !cargo) {
+  if (
+    isOverlapping(boatPos, vec2(1, 3), soul.pos, vec2(2, 2)) &&
+    !cargo &&
+    soulAtDock
+  ) {
     soul.destroy();
     sound_collect.play(1, 0);
     queue.shift().destroy();
+    for (let i = 0; i < queue.length; i++) {
+      queue[i].pos = positions[i];
+    }
+    queue.push(new SoulQueue(vec2(75, 8), new Color(0, 0, 0)));
     cargo = true;
     boat.color = new Color(0.9, 0.9, 0.1);
-    
   }
 }
 
