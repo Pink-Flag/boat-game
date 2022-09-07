@@ -52,7 +52,7 @@ class Boat extends EngineObject {
     if (keyWasPressed(38, 0)) {
       this.velocity.x += Math.sin(this.angle) * speed;
       this.velocity.y += Math.cos(this.angle) * speed;
-
+      sound_row.play();
       if (energy > 0) {
         energy -= 1;
       }
