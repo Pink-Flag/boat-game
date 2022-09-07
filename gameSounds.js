@@ -964,7 +964,7 @@ const sound_music = new Music([
     ],
   ],
   [0, 0, 1, 2, 1, 2, 4, 3, 3, 3, 5, 3, 5, 6, 6, 6, 7],
-  148,
+  147,
   {
     title: "New Song",
     instruments: ["Bass", "Long Trianle", "Short Sine", "Long Sine"],
@@ -1069,18 +1069,42 @@ const sound_siderow = new Sound([
   0.25,
 ]);
 const sound_collect = new Music([
-  [[, 0, 440, 0.03, , 0.59]],
-  [[[0, 0, 17, 20, 24, ,]]],
+  [
+    [, 0, 440, 0.03, , 0.59],
+    [, 0, 220, 0.03, , 0.59],
+  ],
+  [
+    [
+      [, , 17, 20, 24, , , , , , , , , , ,],
+      [1, , 17, 20, 24, , , , , , , , , , ,],
+    ],
+  ],
   [0],
   99,
-  { title: "Arp", instruments: ["sine arp"], patterns: ["Pattern 0"] },
+  {
+    title: "Arp",
+    instruments: ["Instrument 0", "Instrument 1"],
+    patterns: ["Pattern 0"],
+  },
 ]);
 const sound_dock = new Music([
-  [[, 0, 440, 0.03, , 0.59]],
-  [[[0, 0, 24, 20, 17, ,]]],
+  [
+    [, 0, 440, 0.03, , 0.59],
+    [, 0, 220, 0.03, , 0.59],
+  ],
+  [
+    [
+      [, , 24, 20, 17, , , , , , , , , , ,],
+      [1, , 17, 20, 24, , , , , , , , , , ,],
+    ],
+  ],
   [0],
   99,
-  { title: "Arp", instruments: ["sine arp"], patterns: ["Pattern 0"] },
+  {
+    title: "Arp",
+    instruments: ["Instrument 0", "Instrument 1"],
+    patterns: ["Pattern 0"],
+  },
 ]);
 const sound_boost = new Music([
   [
