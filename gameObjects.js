@@ -11,7 +11,7 @@ class Boat extends EngineObject {
     const nextPos = this.pos.x + this.velocity.x;
     if (
       nextPos - this.size.x / 2 < 1 ||
-      nextPos + this.size.x / 2 > levelSize.x - 1
+      nextPos + this.size.x / 2 + 2 > levelSize.x - 1
     ) {
       this.velocity.x *= -0.25;
       this.bounce();
@@ -299,7 +299,7 @@ class Enemy extends EngineObject {
     if (this.active) {
       if (
         nextPos - this.size.x / 2 < 1 ||
-        nextPos + this.size.x / 2 > levelSize.x - 1
+        nextPos + this.size.x / 2 + 2 > levelSize.x - 1
       ) {
         this.velocity.x *= -0.25;
       }
@@ -429,10 +429,34 @@ class Obstacle extends EngineObject {
 
 class Soul extends EngineObject {
   constructor(pos) {
-    super(pos, vec2(2, 2), 0);
+    super(pos, vec2(4, 2), 0);
     this.color = new Color(0.9, 0.9, 0.1);
     this.renderOrder = 2;
     this.tileIndex = -1;
+  }
+}
+////////////////////////////////////////////////////////////////////////////////////////
+
+class SoulQueue extends EngineObject {
+  constructor(pos) {
+    super(pos, vec2(1, 1), 0);
+    this.color = new Color(0.9, 0.9, 0.1);
+    this.renderOrder = 2;
+    this.tileIndex = -1;
+  }
+
+  seekDock() {
+    speed = 0.0005;
+    let attract = vec2(dockPos.x + 1 - this.pos.x, dockPos.y - this.pos.y);
+    this.angle = Math.atan2(attract.x, attract.y);
+    if (dockPos.distance(this.pos) > 3) {
+      this.velocity.x += Math.sin(this.angle) * speed;
+      this.velocity.y += Math.cos(this.angle) * speed;
+    }
+    if (dockPos.distance(this.pos) < 1) {
+      soulAtDock = true;
+    }
+    
   }
 }
 
@@ -524,8 +548,8 @@ class Bullet extends EngineObject {
     const nextPos = this.pos.x + this.velocity.x;
 
     if (
-      nextPos - this.size.x / 2 < 1 ||
-      nextPos + this.size.x / 2 > levelSize.x
+      nextPos - this.size.x / 2 - 1 < 1 ||
+      nextPos + this.size.x / 2 + 4 > levelSize.x
     ) {
       this.sparks();
       sound_explosion.play();
@@ -535,8 +559,6 @@ class Bullet extends EngineObject {
       this.pos.y + this.velocity.y > levelSize.y ||
       this.pos.y + this.velocity.y < 1
     ) {
-      this.sparks();
-      sound_explosion.play();
       this.destroy();
     }
 

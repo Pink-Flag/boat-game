@@ -32,13 +32,16 @@ let boat,
   boost,
   canSpark = true,
   slowEnemyPos,
+  soulAtDock = false,
+  dockPos,
+  queue = [],
   energyBarColour = new Color(0, 1, 0.5);
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameInit() {
   // create tile collision and visible tile layer
   canvasFixedSize = vec2(1280, 720);
-  levelSize = vec2(72, 40);
+  levelSize = vec2(76, 40);
   cameraPos = levelSize.scale(0.5);
   initTileCollision(vec2(5, 5));
   const tileLayer = new TileLayer(vec2(), undefined, 64);
@@ -169,6 +172,18 @@ function gameUpdate() {
     dockSoul();
     collectSoul();
 
+    if (queue.length === 0) {
+      queue.push(new SoulQueue(vec2(75, 16)));
+      queue.push(new SoulQueue(vec2(75, 12)));
+      queue.push(new SoulQueue(vec2(75, 8)));
+    }
+
+    if (!soulAtDock) {
+      queue[0].seekDock();
+    }
+
+    console.log(queue[0]);
+
     energyCheck();
     boat.tileIndex = 0;
 
@@ -211,6 +226,22 @@ function gameRenderPost() {
     drawRect(vec2(50 + energy / 12, 41), energybar, energyBarColour, 0, 0);
   } else {
     drawRect(cameraPos, levelSize, new Color(0.21, 0.21, 0.21), 0, 0);
+  }
+  if (startGame) {
+    drawRect(
+      vec2(0, levelSize.y / 2),
+      vec2(4, 40),
+      new Color(0.87, 0.72, 0.54),
+      0,
+      0
+    );
+    drawRect(
+      vec2(74, levelSize.y / 2),
+      vec2(4, 40),
+      new Color(0.87, 0.72, 0.54),
+      0,
+      0
+    );
   }
 }
 

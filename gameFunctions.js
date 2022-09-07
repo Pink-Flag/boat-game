@@ -66,7 +66,9 @@ function gameOver() {
   );
 }
 function createSoul() {
-  soul = new Soul(vec2(levelSize.x - 3, Math.random() * (35 - 5) + 5));
+  soul = new Soul(vec2(levelSize.x - 4, Math.random() * (35 - 5) + 5));
+  // soul = new Soul(vec2(72, 30));
+  dockPos = soul.pos;
 }
 
 function dockSoul() {
@@ -81,6 +83,8 @@ function dockSoul() {
       score++;
       sound_dock.play(1, 0);
       createSoul();
+      soulAtDock = false
+      // queue[0].seekDock();
     }
     cargo = false;
   }
@@ -89,8 +93,10 @@ function collectSoul() {
   if (isOverlapping(boatPos, vec2(1, 3), soul.pos, vec2(2, 2)) && !cargo) {
     soul.destroy();
     sound_collect.play(1, 0);
+    queue.shift().destroy();
     cargo = true;
     boat.color = new Color(0.9, 0.9, 0.1);
+    
   }
 }
 
@@ -207,7 +213,7 @@ function createShimmer() {
   shimmer = new ParticleEmitter(
     vec2(36, 20),
     0,
-    vec2(72, 40),
+    vec2(68, 40),
     1,
     0.5,
     PI, // pos, angle, emitSize, emitTime, emitRate, emiteCone
