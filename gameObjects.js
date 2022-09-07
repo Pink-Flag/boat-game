@@ -420,6 +420,9 @@ class Obstacle extends EngineObject {
   }
   collideWithBoatDetection() {
     if (isOverlapping(this.pos, vec2(2, 3), boatPos, vec2(1.6, 3))) {
+      if (!isGameOver) {
+        sound_whirlpool.play();
+      }
       energy -= 1;
     }
   }
@@ -458,6 +461,7 @@ class Boost extends EngineObject {
   }
   boatCollectBoost() {
     if (isOverlapping(this.pos, vec2(1, 1), boatPos, vec2(1.6, 3))) {
+      sound_boost.play(1, 0);
       boost.pos = vec2(100, 100);
       if (energy <= 75) {
         energy += 25;
