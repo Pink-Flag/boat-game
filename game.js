@@ -11,7 +11,7 @@ let boat,
   enemy3,
   currentAliveTime = 0,
   obstacle,
-  soul,
+  dock,
   energy = 100,
   port,
   shimmer,
@@ -23,7 +23,7 @@ let boat,
   enemy2IsHome = false,
   enemy3IsHome = false,
   startGame = false,
-  positions = [vec2(75, 16), vec2(75, 12), vec2(75, 8)],
+  queuePos = [vec2(75, 16), vec2(75, 12), vec2(75, 8)],
   moveSpeed,
   secondScreen = false,
   cargo = false,
@@ -44,7 +44,10 @@ function gameInit() {
   cameraPos = levelSize.scale(0.5);
   initTileCollision(vec2(5, 5));
   const tileLayer = new TileLayer(vec2(), undefined, 64);
-  sound_music.play(1.5);
+  // sound_music.play(1.5);
+  // createDock();
+  // dockPos = dock.pos;
+  // queue.push(new SoulQueue(dockPos, new Color(1, 1, 1)));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -63,6 +66,7 @@ function gameUpdate() {
     if (secondScreen) {
       if (keyWasPressed(32, 0)) {
         startGame = true;
+        sound_music.play();
       }
     }
   } else {
@@ -88,8 +92,8 @@ function gameUpdate() {
       showBoost();
     }
 
-    if (!soul) {
-      createSoul();
+    if (!dock) {
+      createDock();
     }
 
     slowEnemy.collideWithBoatDetection();
@@ -118,9 +122,9 @@ function gameUpdate() {
       enemy.moveEnemy();
       enemy.trail(3);
     }
-    // enemy.collideWithBoatDetection();
-    // enemy2.collideWithBoatDetection();
-    // enemy3.collideWithBoatDetection();
+    enemy.collideWithBoatDetection();
+    enemy2.collideWithBoatDetection();
+    enemy3.collideWithBoatDetection();
 
     obstacle.tileIndex = -1;
     obstacle.collideWithBoatDetection();
@@ -152,8 +156,9 @@ function gameUpdate() {
           enemy3.active = true;
         }
       }
+      console.log(queuePos[0]);
 
-      slowEnemy.enemySeek(0.0003, false);
+      slowEnemy.enemySeek(0.0003, true);
       slowEnemy.shoot();
       slowEnemy.trail(3, -0.05);
       boat.moveBoat();
@@ -172,20 +177,20 @@ function gameUpdate() {
     dockSoul();
     collectSoul();
 
+    function randomColour() {
+      return new Color(Math.random(), Math.random(), Math.random());
+    }
     if (queue.length === 0) {
-      queue.push(new SoulQueue(vec2(75, 16), new Color(0.9, 0.9, 0.9)));
-      queue.push(new SoulQueue(vec2(75, 12), new Color(0.9, 0, 0)));
-      queue.push(new SoulQueue(vec2(75, 8), new Color(0, 0.9, 0.9)));
+      queue.push(new SoulQueue(dockPos, new Color(1, 1, 1)));
     }
 
-    // queue[0] = new SoulQueue(pos1);
-    // queue[1] = new SoulQueue(pos2);
-    // queue[2] = new SoulQueue(pos3);
-    // console.log(queue);
+    if (queue.length < 3) {
+      queue.push(new SoulQueue(vec2(79, 16), randomColour()));
+    }
+
     if (!soulAtDock) {
       queue[0].seekDock();
     }
-    console.log(queue);
 
     energyCheck();
     boat.tileIndex = 0;
@@ -227,8 +232,6 @@ function gameRenderPost() {
     );
     let energybar = vec2(energy / 6, 1);
     drawRect(vec2(50 + energy / 12, 41), energybar, energyBarColour, 0, 0);
-  } else {
-    drawRect(cameraPos, levelSize, new Color(0.21, 0.21, 0.21), 0, 0);
   }
   if (startGame) {
     drawRect(

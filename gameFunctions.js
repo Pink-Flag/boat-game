@@ -65,10 +65,10 @@ function gameOver() {
     8
   );
 }
-function createSoul() {
-  soul = new Soul(vec2(levelSize.x - 4, Math.random() * (35 - 5) + 5));
+function createDock() {
+  dock = new Dock(vec2(levelSize.x - 4, Math.random() * (35 - 5) + 5));
   // soul = new Soul(vec2(72, 30));
-  dockPos = soul.pos;
+  dockPos = dock.pos;
 }
 
 function dockSoul() {
@@ -82,26 +82,27 @@ function dockSoul() {
       }
       score++;
       sound_dock.play(1, 0);
-      createSoul();
+      createDock();
       soulAtDock = false;
       // queue[0].seekDock();
     }
     cargo = false;
   }
 }
+
 function collectSoul() {
   if (
-    isOverlapping(boatPos, vec2(1, 3), soul.pos, vec2(2, 2)) &&
+    isOverlapping(boatPos, vec2(1, 3), dock.pos, vec2(2, 2)) &&
     !cargo &&
     soulAtDock
   ) {
-    soul.destroy();
+    dock.destroy();
     sound_collect.play(1, 0);
     queue.shift().destroy();
-    for (let i = 0; i < queue.length; i++) {
-      queue[i].pos = positions[i];
-    }
-    queue.push(new SoulQueue(vec2(75, 8), new Color(0, 0, 0)));
+    // for (let i = 0; i < queue.length; i++) {
+    //   dockPos = queuePos[i];
+    // }
+    // queue.push(new SoulQueue(vec2(75, 8), new Color(0, 0, 0)));
     cargo = true;
     boat.color = new Color(0.9, 0.9, 0.1);
   }
@@ -197,13 +198,11 @@ function gameReset() {
   currentAliveTime = boat.getAliveTime();
   enemy3.active = false;
   obstacle.pos = vec2(20, -20);
-  // obstacle.xStart = Math.random() * (50 - 20) + 20;
-  // obstacle.yStart = Math.random() * (30 - 10) + 10;
 
   if (cargo) {
     boat.color = new Color(0.9, 0.9, 0.9);
     cargo = false;
-    createSoul();
+    createDock();
   }
 }
 
