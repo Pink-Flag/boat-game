@@ -45,6 +45,7 @@ function gameInit() {
   cameraPos = levelSize.scale(0.5);
   initTileCollision(vec2(5, 5));
   const tileLayer = new TileLayer(vec2(), undefined, 64);
+  sound_music.play(1.5);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

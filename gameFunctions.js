@@ -189,8 +189,9 @@ function gameReset() {
   slowEnemy.pos = vec2(60, 30);
   currentAliveTime = boat.getAliveTime();
   enemy3.active = false;
-  obstacle.xStart = Math.random() * (50 - 20) + 20;
-  obstacle.yStart = Math.random() * (30 - 10) + 10;
+  obstacle.pos = vec2(20, -20);
+  // obstacle.xStart = Math.random() * (50 - 20) + 20;
+  // obstacle.yStart = Math.random() * (30 - 10) + 10;
 
   if (cargo) {
     boat.color = new Color(0.9, 0.9, 0.9);
