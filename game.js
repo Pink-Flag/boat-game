@@ -32,6 +32,7 @@ let boat,
   canSpark = true,
   slowEnemyPos,
   soulAtDock = false,
+  isSoulInBoat = false,
   dockPos,
   queue = [],
   energyBarColour = new Color(0, 1, 0.5);
@@ -156,7 +157,6 @@ function gameUpdate() {
           enemy3.active = true;
         }
       }
-      console.log(queuePos[0]);
 
       slowEnemy.enemySeek(0.0003, true);
       slowEnemy.shoot();
@@ -187,6 +187,7 @@ function gameUpdate() {
     if (queue.length < 3) {
       queue.push(new SoulQueue(vec2(79, 16), randomColour()));
     }
+    console.log(queue[0].angle, boat.angle);
 
     if (!soulAtDock) {
       queue[0].seekDock();
@@ -200,6 +201,9 @@ function gameUpdate() {
     if (isGameOver && keyWasPressed(32, 0)) {
       gameReset();
     }
+  }
+  if (isSoulInBoat) {
+    soulInBoat();
   }
 }
 

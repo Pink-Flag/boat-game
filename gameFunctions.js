@@ -82,12 +82,20 @@ function dockSoul() {
       }
       score++;
       sound_dock.play(1, 0);
+      queue.shift().destroy();
       createDock();
       soulAtDock = false;
       // queue[0].seekDock();
     }
     cargo = false;
+    isSoulInBoat = false;
   }
+}
+
+function soulInBoat() {
+  // queue[0].angleVelocity = boat.pos.angleVelocity;
+
+  queue[0].angle = boat.angle;
 }
 
 function collectSoul() {
@@ -98,7 +106,9 @@ function collectSoul() {
   ) {
     dock.destroy();
     sound_collect.play(1, 0);
-    queue.shift().destroy();
+    isSoulInBoat = true;
+    queue[0].pos = boatPos;
+
     // for (let i = 0; i < queue.length; i++) {
     //   dockPos = queuePos[i];
     // }

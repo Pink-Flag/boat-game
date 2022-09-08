@@ -159,7 +159,6 @@ class Enemy extends EngineObject {
     let angleRad = Math.atan2(attract.x, attract.y);
     if (slowEnemy) {
       if (this.pos.distance(boatPos) > 15) {
-        console.log("slow");
         this.velocity.x += Math.sin(angleRad) * enemySpeed;
         this.velocity.y += Math.cos(angleRad) * enemySpeed;
       }
@@ -434,8 +433,8 @@ class Obstacle extends EngineObject {
 class Dock extends EngineObject {
   constructor(pos) {
     super(pos, vec2(4, 2), 0);
-    this.color = new Color(0.9, 0.9, 0.1);
-    this.renderOrder = 2;
+    this.color = new Color(0.9, 0.9, 0.1, 0);
+    this.renderOrder = -10;
     this.tileIndex = -1;
   }
 }
@@ -455,6 +454,7 @@ class SoulQueue extends EngineObject {
     speed = 0.0005;
     let attract = vec2(dockPos.x + 1 - this.pos.x, dockPos.y - this.pos.y);
     this.angle = Math.atan2(attract.x, attract.y);
+    console.log("am i on");
     if (dockPos.distance(this.pos) > 3) {
       this.velocity.x += Math.sin(this.angle) * speed;
       this.velocity.y += Math.cos(this.angle) * speed;
