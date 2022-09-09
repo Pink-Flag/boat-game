@@ -78,10 +78,10 @@ class Boat extends EngineObject {
     let distance = obstaclePos.distance(this.pos);
     let whirlSpeed = (11 - distance) / 1000;
     if (distance < 8) {
-      let attract = vec2(
-        obstaclePos.x - this.pos.x,
-        obstaclePos.y - this.pos.y
-      );
+      // let attract = vec2(
+      //   obstaclePos.x - this.pos.x,
+      //   obstaclePos.y - this.pos.y
+      // );
       moveObject(this, whirlSpeed, attract);
       // this.velocity.x += Math.sin(angleRad) * whirlSpeed;
       // this.velocity.y += Math.cos(angleRad) * whirlSpeed;

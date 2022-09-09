@@ -233,12 +233,13 @@ function randomColour() {
   return new Color(Math.random(), Math.random(), Math.random());
 }
 
-function moveObject(obj, speed, angle = obj.angle) {
-  obj.velocity.x += Math.sin(angle) * speed;
-  obj.velocity.y += Math.cos(angle) * speed;
+function moveObject(obj, speed) {
+  obj.velocity.x += Math.sin(obj.angle) * speed;
+  obj.velocity.y += Math.cos(obj.angle) * speed;
 }
-// function attractObject(obj, speed, attract ){
-//   let angleRad = Math.atan2(attract.x, attract.y);
-//   obj.velocity.x += Math.sin(angleRad) * speed;
-//  obj.velocity.y += Math.cos(angleRad) * speed;
-// }
+function attractObject(obj, speed, goalPos) {
+  let attract = vec2(goalPos.x - obj.pos.x, goalPos.y - obj.pos.y);
+  let angleRad = Math.atan2(attract.x, attract.y);
+  obj.velocity.x += Math.sin(angleRad) * speed;
+  obj.velocity.y += Math.cos(angleRad) * speed;
+}
