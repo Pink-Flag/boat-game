@@ -67,7 +67,6 @@ function gameOver() {
 }
 function createDock() {
   dock = new Dock(vec2(levelSize.x - 4, Math.random() * (35 - 5) + 5));
-  // soul = new Soul(vec2(72, 30));
   dockPos = dock.pos;
 }
 
@@ -85,7 +84,6 @@ function dockSoul() {
       queue.shift().destroy();
       createDock();
       soulAtDock = false;
-      // queue[0].seekDock();
     }
     cargo = false;
     isSoulInBoat = false;
@@ -93,8 +91,6 @@ function dockSoul() {
 }
 
 function soulInBoat() {
-  // queue[0].angleVelocity = boat.pos.angleVelocity;
-
   queue[0].angle = boat.angle;
 }
 
@@ -108,11 +104,6 @@ function collectSoul() {
     sound_collect.play(1, 0);
     isSoulInBoat = true;
     queue[0].pos = boatPos;
-
-    // for (let i = 0; i < queue.length; i++) {
-    //   dockPos = queuePos[i];
-    // }
-    // queue.push(new SoulQueue(vec2(75, 8), new Color(0, 0, 0)));
     cargo = true;
     boat.color = new Color(0.9, 0.9, 0.1);
   }
@@ -120,42 +111,29 @@ function collectSoul() {
 
 function introScreen() {
   drawTextScreen(
-    "River of Woe",
+    `River of Woe`,
     vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.2),
     100,
     new Color(),
     12
   );
   drawTextScreen(
-    "You are Charon, the ferryman of Hades, who needs to carry the souls",
+    `You are Charon, the ferryman of Hades, who needs to carry the souls
+
+    of the newly deceased who had received the rites of burial across
+
+    the river Acheron that devides the world of the living from the
+    
+    world of the dead.
+    `,
     vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.4),
     35,
     new Color(),
     6
   );
+
   drawTextScreen(
-    "of the newly deceased who had received the rites of burial across",
-    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.48),
-    35,
-    new Color(),
-    6
-  );
-  drawTextScreen(
-    "the river Acheron that devides the world of the living from the ",
-    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.56),
-    35,
-    new Color(),
-    6
-  );
-  drawTextScreen(
-    "world of the dead.",
-    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.64),
-    35,
-    new Color(),
-    6
-  );
-  drawTextScreen(
-    "press space to continue.",
+    "press space to continue",
     vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.84),
     30,
     new Color(),
@@ -164,27 +142,19 @@ function introScreen() {
 }
 function controllsScreen() {
   drawTextScreen(
-    "- press left arrow + right arrow to row forward",
-    vec2(overlayCanvas.width / 2 - 50, overlayCanvas.height * 0.3),
-    40,
-    new Color(),
-    6
-  );
-  drawTextScreen(
-    "- press left arrow to turn left",
-    vec2(overlayCanvas.width / 2 - 205, overlayCanvas.height * 0.4),
-    40,
-    new Color(),
-    6
-  );
-  drawTextScreen(
-    "- press right arrow to turn right",
-    vec2(overlayCanvas.width / 2 - 180, overlayCanvas.height * 0.5),
-    40,
-    new Color(),
-    6
-  );
+    `- press left arrow + right arrow to row forward
+    
+     - press left arrow to turn left
 
+     - press right arrow to turn right
+    `,
+    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.3),
+    40,
+    new Color(),
+    6,
+    new Color(0, 0, 0),
+    "center"
+  );
   drawTextScreen(
     "press space to continue.",
     vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.84),
@@ -257,4 +227,13 @@ function createShimmer() {
     0
     // randomness, collide, additive, randomColorLinear, renderOrder
   );
+}
+
+function randomColour() {
+  return new Color(Math.random(), Math.random(), Math.random());
+}
+
+function moveObject(obj, speed){
+  obj.velocity.x += Math.sin(obj.angle) * speed;
+ obj.velocity.y += Math.cos(obj.angle) * speed;
 }

@@ -23,7 +23,6 @@ let boat,
   enemy2IsHome = false,
   enemy3IsHome = false,
   startGame = false,
-  queuePos = [vec2(75, 16), vec2(75, 12), vec2(75, 8)],
   moveSpeed,
   secondScreen = false,
   cargo = false,
@@ -45,10 +44,6 @@ function gameInit() {
   cameraPos = levelSize.scale(0.5);
   initTileCollision(vec2(5, 5));
   const tileLayer = new TileLayer(vec2(), undefined, 64);
-  // sound_music.play(1.5);
-  // createDock();
-  // dockPos = dock.pos;
-  // queue.push(new SoulQueue(dockPos, new Color(1, 1, 1)));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -176,10 +171,7 @@ function gameUpdate() {
 
     dockSoul();
     collectSoul();
-
-    function randomColour() {
-      return new Color(Math.random(), Math.random(), Math.random());
-    }
+    
     if (queue.length === 0) {
       queue.push(new SoulQueue(dockPos, new Color(1, 1, 1)));
     }

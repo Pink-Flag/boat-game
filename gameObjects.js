@@ -50,8 +50,7 @@ class Boat extends EngineObject {
       sound_siderow.play();
     }
     if (keyWasPressed(38, 0)) {
-      this.velocity.x += Math.sin(this.angle) * speed;
-      this.velocity.y += Math.cos(this.angle) * speed;
+      moveObject(this, speed);
       sound_row.play();
       if (energy > 0) {
         energy -= 1;
@@ -62,8 +61,7 @@ class Boat extends EngineObject {
       (keyWasPressed(39, 0) && keyIsDown(37, 0))
     ) {
       //up
-      this.velocity.x += Math.sin(this.angle) * speed;
-      this.velocity.y += Math.cos(this.angle) * speed;
+      moveObject(this, speed);
       sound_row.play();
       if (energy > 0) {
         energy -= 1;
@@ -84,9 +82,10 @@ class Boat extends EngineObject {
         obstaclePos.x - this.pos.x,
         obstaclePos.y - this.pos.y
       );
-      let angleRad = Math.atan2(attract.x, attract.y);
-      this.velocity.x += Math.sin(angleRad) * whirlSpeed;
-      this.velocity.y += Math.cos(angleRad) * whirlSpeed;
+      this.angle = Math.atan2(attract.x, attract.y);
+      // this.velocity.x += Math.sin(angleRad) * whirlSpeed;
+      // this.velocity.y += Math.cos(angleRad) * whirlSpeed;
+      moveObject(this, whirlSpeed);
     }
   }
 
@@ -462,14 +461,6 @@ class SoulQueue extends EngineObject {
     if (dockPos.distance(this.pos) < 1) {
       soulAtDock = true;
     }
-    // queue[1].velocity.y = 4
-  }
-  nextInLine(pos) {
-    speed = 0.0001;
-    let attract = vec2(pos.x - this.pos.x, pos.y - this.pos.y);
-    this.angle = Math.atan2(attract.x, attract.y);
-    this.velocity.x += Math.sin(this.angle) * speed;
-    this.velocity.y += Math.cos(this.angle) * speed;
   }
 }
 
@@ -598,7 +589,7 @@ class Bullet extends EngineObject {
   }
 
   sparks() {
-    let sparkEmitter = new ParticleEmitter(
+    new ParticleEmitter(
       this.pos,
       this.angle,
       1,
