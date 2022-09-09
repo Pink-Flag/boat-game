@@ -78,13 +78,7 @@ class Boat extends EngineObject {
     let distance = obstaclePos.distance(this.pos);
     let whirlSpeed = (11 - distance) / 1000;
     if (distance < 8) {
-      // let attract = vec2(
-      //   obstaclePos.x - this.pos.x,
-      //   obstaclePos.y - this.pos.y
-      // );
-      moveObject(this, whirlSpeed, attract);
-      // this.velocity.x += Math.sin(angleRad) * whirlSpeed;
-      // this.velocity.y += Math.cos(angleRad) * whirlSpeed;
+      attractObject(this, whirlSpeed, obstaclePos);
     }
   }
 
@@ -142,27 +136,15 @@ class Enemy extends EngineObject {
     this.isHome = false;
   }
   seekHome() {
-    let attract = vec2(this.home.x - this.pos.x, this.home.y - this.pos.y);
-    this.angle = Math.atan2(attract.x, attract.y);
-    this.velocity.x += Math.sin(this.angle) * 0.001;
-    this.velocity.y += Math.cos(this.angle) * 0.001;
+    attractObject(this, 0.001, this.home, true);
   }
-  enemySeek(
-    speed = Math.random() * (0.004 - 0.0002) + 0.0002,
-    slowEnemy = false
-  ) {
-    let enemySpeed = speed;
-    let attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
-    this.angle = Math.atan2(attract.x, attract.y);
-    let angleRad = Math.atan2(attract.x, attract.y);
+  enemySeek(speed = calculateEnemySpeed(), slowEnemy = false) {
     if (slowEnemy) {
       if (this.pos.distance(boatPos) > 15) {
-        this.velocity.x += Math.sin(angleRad) * enemySpeed;
-        this.velocity.y += Math.cos(angleRad) * enemySpeed;
+        attractObject(this, speed, boatPos, true);
       }
     } else {
-      this.velocity.x += Math.sin(angleRad) * enemySpeed;
-      this.velocity.y += Math.cos(angleRad) * enemySpeed;
+      attractObject(this, speed, boatPos, true);
     }
   }
   enemyHoldX() {
@@ -172,12 +154,10 @@ class Enemy extends EngineObject {
     if (this.pos.x < 15) {
       this.aim = 65;
     }
-
-    let enemySpeed = Math.random() * (0.004 - 0.0002) + 0.0002;
+    let speed = calculateEnemySpeed();
     let attract = vec2(this.aim, 0);
     this.angle = Math.atan2(attract.x, attract.y);
-    let angleRad = Math.atan2(attract.x, attract.y);
-    this.velocity.x += Math.sin(angleRad) * enemySpeed;
+    this.velocity.x += Math.sin(this.angle) * speed;
   }
 
   enemyHoldY() {
@@ -188,11 +168,10 @@ class Enemy extends EngineObject {
       this.aim = 35;
     }
 
-    let enemySpeed = Math.random() * (0.004 - 0.0002) + 0.0002;
+    let speed = calculateEnemySpeed();
     let attract = vec2(0, this.aim);
     this.angle = Math.atan2(attract.x, attract.y);
-    let angleRad = Math.atan2(attract.x, attract.y);
-    this.velocity.y += Math.cos(angleRad) * enemySpeed;
+    this.velocity.y += Math.cos(this.angle) * speed;
   }
 
   moveEnemy() {
@@ -363,29 +342,17 @@ class Obstacle extends EngineObject {
   }
   obstacleOffCanvas() {
     if (this.pos.distance(this.offCanvas) > 1) {
-      let attract = vec2(
-        this.offCanvas.x - this.pos.x,
-        this.offCanvas.y - this.pos.y
-      );
-      this.angle = Math.atan2(attract.x, attract.y);
-
-      this.velocity.x += Math.sin(this.angle) * this.speed;
-      this.velocity.y += Math.cos(this.angle) * this.speed;
+      attractObject(this, this.speed, this.offCanvas);
     } else {
       obstacleIsHome = false;
       this.t = 0;
-
       this.xrad = 15;
       this.yrad = 10;
     }
   }
 
   seekHome() {
-    let attract = vec2(this.home.x + 15 - this.pos.x, this.home.y - this.pos.y);
-    this.angle = Math.atan2(attract.x, attract.y);
-
-    this.velocity.x += Math.sin(this.angle) * this.speed;
-    this.velocity.y += Math.cos(this.angle) * this.speed;
+    attractObject(this, this.speed, vec2(this.home.x + 15, this.home.y));
   }
   whirl() {
     let emitter = new ParticleEmitter(
@@ -449,13 +416,8 @@ class SoulQueue extends EngineObject {
   }
 
   seekDock() {
-    speed = 0.0005;
-    let attract = vec2(dockPos.x + 1 - this.pos.x, dockPos.y - this.pos.y);
-    this.angle = Math.atan2(attract.x, attract.y);
-    console.log("am i on");
     if (dockPos.distance(this.pos) > 3) {
-      this.velocity.x += Math.sin(this.angle) * speed;
-      this.velocity.y += Math.cos(this.angle) * speed;
+      attractObject(this, 0.0005, vec2(dockPos.x + 1, dockPos.y));
     }
     if (dockPos.distance(this.pos) < 1) {
       soulAtDock = true;
@@ -539,7 +501,6 @@ class Bullet extends EngineObject {
     super(pos, vec2());
     this.color = new Color(1, 1, 0);
     this.velocity = velocity;
-
     this.damping = 1;
     this.gravityScale = 0;
     this.renderOrder = 100;
