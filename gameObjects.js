@@ -82,10 +82,9 @@ class Boat extends EngineObject {
         obstaclePos.x - this.pos.x,
         obstaclePos.y - this.pos.y
       );
-      this.angle = Math.atan2(attract.x, attract.y);
+      moveObject(this, whirlSpeed, attract);
       // this.velocity.x += Math.sin(angleRad) * whirlSpeed;
       // this.velocity.y += Math.cos(angleRad) * whirlSpeed;
-      moveObject(this, whirlSpeed);
     }
   }
 
