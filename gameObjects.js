@@ -96,12 +96,6 @@ class Boat extends EngineObject {
         this.tileIndex = 3;
       }
     }
-    // if (keyIsDown(37, 0) && keyIsDown(38, 0)) {
-    //   this.tilePos = vec2(2, 0);
-    // }
-    // if (keyIsDown(39, 0) && keyIsDown(38, 0)) {
-    //   this.tilePos = vec2(3, 0);
-    // }
   }
 
   calculateMoveSpeed() {
@@ -136,8 +130,8 @@ class Boat extends EngineObject {
       new Color(1, 1, 1, 0),
       new Color(0, 0, 0, 0), // colorEndA, colorEndB
       2,
-      0.07,
-      0.07,
+      0.15,
+      0.15,
       0.05,
       this.angleVelocity, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
       0.99,
@@ -158,13 +152,13 @@ class Boat extends EngineObject {
 
 class Enemy extends EngineObject {
   constructor(pos, axis, active = false, home) {
-    super(pos, vec2(2, 3.91), 0);
-    this.color = new Color(0.8, 0, 0);
+    super(pos, vec2(3, 3), 0);
+    // this.color = new Color(0.8, 0, 0);
     this.setCollision(1, 1, 1);
     this.aim = -20;
     this.axis = axis;
     this.tileSize = vec2(16, 16);
-    this.tileIndex = 1;
+    this.tileIndex = 9;
     this.renderOrder = 2;
     this.active = active;
     this.home = home;
@@ -211,6 +205,12 @@ class Enemy extends EngineObject {
 
   moveEnemy() {
     let distance = boatPos.distance(this.pos);
+    if (Math.floor(this.getAliveTime()) % 2 == 0) {
+      this.tileIndex = 8;
+    } else {
+      this.tileIndex = 9;
+    }
+
     if (distance < 25) {
       this.enemySeek();
     } else {
@@ -240,8 +240,8 @@ class Enemy extends EngineObject {
       new Color(1, 1, 1, 0),
       new Color(0, 0, 0, 0), // colorEndA, colorEndB
       2,
-      0.07,
-      0.07,
+      0.15,
+      0.15,
       trailVelocity,
       this.angleVelocity, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
       0.99,
@@ -290,7 +290,7 @@ class Enemy extends EngineObject {
   }
 
   collideWithBoatDetection() {
-    if (isOverlapping(this.pos, vec2(2.5, 4.41), boatPos, vec2(2.5, 4.41))) {
+    if (isOverlapping(this.pos, vec2(3.2, 3.2), boatPos, vec2(3.2, 3.2))) {
       if (!isGameOver) {
         sound_crash.play();
       }
@@ -333,8 +333,8 @@ class Enemy extends EngineObject {
 
 class Obstacle extends EngineObject {
   constructor(pos, home) {
-    super(pos, vec2(1), 0);
-    this.color = new Color(0.1, 0.9, 0.1);
+    super(pos, vec2(2), 0);
+
     this.setCollision(0, 0);
     this.start = home;
     this.offCanvas = pos;
@@ -345,6 +345,8 @@ class Obstacle extends EngineObject {
     this.renderOrder = -1;
     this.home = home;
     this.speed = 0.001;
+    this.tileIndex = 7;
+    this.drawSize = vec2(3);
   }
   moveObstacle() {
     this.pos.x = this.start.x + this.xrad * Math.sin(this.t + Math.PI / 2);
@@ -426,6 +428,14 @@ class Obstacle extends EngineObject {
       energy -= 1;
     }
   }
+  update() {
+    if (!isGameOver) {
+      this.angleVelocity = 0.2;
+    } else {
+      this.angleVelocity = 0;
+    }
+    super.update();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -441,22 +451,45 @@ class Dock extends EngineObject {
 ////////////////////////////////////////////////////////////////////////////////////////
 
 class SoulQueue extends EngineObject {
-  constructor(pos, color) {
+  constructor(pos, color, angle) {
     super(pos, vec2(1, 1), 0);
     this.color = color;
     this.renderOrder = 2;
-    this.tileIndex = -1;
+    this.tileIndex = 6;
+    this.drawSize = vec2(5, 5);
     this.startPos = pos;
     this.renderOrder = 5;
+    this.angle = angle;
   }
 
   seekDock() {
     if (dockPos.distance(this.pos) > 3) {
-      attractObject(this, 0.0005, vec2(dockPos.x + 1, dockPos.y));
+      attractObject(this, 0.0005, vec2(dockPos.x + 1, dockPos.y), true);
     }
     if (dockPos.distance(this.pos) < 1) {
       soulAtDock = true;
     }
+  }
+  restrictMovement() {
+    const nextPos = this.pos.x + this.velocity.x;
+    if (this.active) {
+      if (
+        nextPos - this.size.x / 2 < 1 ||
+        nextPos + this.size.x / 2 + 2 > levelSize.x - 1
+      ) {
+        this.velocity.x *= -0.25;
+      }
+      if (
+        this.pos.y + this.velocity.y > levelSize.y - 1 ||
+        this.pos.y + this.velocity.y < 1
+      ) {
+        this.velocity.y *= -0.25;
+      }
+    }
+  }
+  update() {
+    this.restrictMovement();
+    super.update();
   }
 }
 
@@ -465,9 +498,10 @@ class SoulQueue extends EngineObject {
 class Port extends EngineObject {
   constructor(pos) {
     super(pos, vec2(2, 4), 0);
-    this.color = new Color(0.9, 0.9, 0.1);
+    // this.color = new Color(0.9, 0.9, 0.1);
     this.renderOrder = 1;
-    this.tileIndex = -1;
+    this.tileIndex = 4;
+    this.tileSize = vec2(16, 32);
   }
 }
 
@@ -475,14 +509,16 @@ class Port extends EngineObject {
 
 class Boost extends EngineObject {
   constructor(pos) {
-    super(pos, vec2(1, 1), 0);
-    this.color = new Color(0.9, 0, 0);
+    super(pos, vec2(2, 2), 0);
+    this.drawSize = vec2(4, 4);
+
     this.renderOrder = 2;
-    this.tileIndex = -1;
+    this.tileIndex = 13;
   }
   boatCollectBoost() {
     if (isOverlapping(this.pos, vec2(1, 1), boatPos, vec2(1.6, 3))) {
       sound_boost.play(1, 0);
+      this.collectFireworks();
       boost.pos = vec2(100, 100);
       if (energy <= 75) {
         energy += 25;
@@ -490,6 +526,38 @@ class Boost extends EngineObject {
         energy = 100;
       }
     }
+  }
+  collectFireworks() {
+    new ParticleEmitter(
+      this.pos,
+      this.angle,
+      1,
+      0.5,
+      20,
+      Math.PI, // pos, angle, emitSize, emitTime, emitRate, emiteCone
+      -1,
+      vec2(16), // tileIndex, tileSize
+      new Color(1, 1, 0),
+      new Color(0, 0, 0), // colorStartA, colorStartB
+      new Color(0.9, 0.9, 0.1, 0),
+      new Color(0, 0, 0, 0), // colorEndA, colorEndB
+      2,
+      0.2,
+      0.2,
+      0.2,
+      this.angle, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
+      0.99,
+      1,
+      1,
+      PI,
+      0.05, // damping, angleDamping, gravityScale, particleCone, fadeRate,
+      0.1,
+      1,
+      0,
+      1,
+      3
+      // randomness, collide, additive, randomColorLinear, renderOrder
+    );
   }
 }
 
@@ -499,9 +567,10 @@ class SlowEnemy extends Enemy {
   constructor(pos) {
     super(pos);
     this.color = new Color(0.9, 0.9, 0.1);
-    this.renderOrder = 2;
-    this.tileIndex = 2;
-    this.tileSize = vec2(32, 16);
+    this.renderOrder = 8;
+    this.tileIndex = 5;
+    this.tileSize = vec2(16, 32);
+    this.drawSize = vec2(4, 8);
     this.speed = 0.1;
     this.active = true;
     this.attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
@@ -541,12 +610,47 @@ class Bullet extends EngineObject {
     this.angle = angle;
     this.damping = 1;
     this.gravityScale = 0;
-    this.tileIndex = 4;
+    this.tileIndex = 10;
     this.tileSize = vec2(16, 16);
-    this.renderOrder = 100;
+    this.renderOrder = 2;
     this.drawSize = vec2(3, 3);
     this.range = 2;
     this.setCollision(1);
+  }
+  trail() {
+    let trailPos = vec2(
+      this.pos.x - this.velocity.x,
+      this.pos.y - this.velocity.y
+    );
+    let emitter = new ParticleEmitter(
+      trailPos,
+      this.angleVelocity,
+      1,
+      0.2,
+      1,
+      2, // pos, angle, emitSize, emitTime, emitRate, emiteCone
+      -1,
+      vec2(16), // tileIndex, tileSize
+      new Color(1, 0, 0),
+      new Color(0, 0, 0), // colorStartA, colorStartB
+      new Color(0.9, 0.9, 0.1, 0),
+      new Color(0, 0, 0, 0), // colorEndA, colorEndB
+      2,
+      0.15,
+      0.15,
+      0.05,
+      this.angleVelocity, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
+      0.99,
+      1,
+      1,
+      Math.PI,
+      0.05, // damping, angleDamping, gravityScale, particleCone, fadeRate,
+      0.1,
+      100 // randomness, collide, additive, randomColorLinear, renderOrder
+    );
+
+    emitter.mass = 1;
+    emitter.elasticity = 0.5;
   }
 
   update() {
@@ -570,7 +674,7 @@ class Bullet extends EngineObject {
     if (isGameOver) {
       this.destroy();
     }
-
+    this.trail();
     super.update();
   }
 
@@ -619,5 +723,17 @@ class Bullet extends EngineObject {
       3
       // randomness, collide, additive, randomColorLinear, renderOrder
     );
+  }
+}
+
+class Bank extends EngineObject {
+  constructor(pos) {
+    super(pos, vec2(4, 16), 0);
+
+    this.setCollision(1, 1, 1);
+    this.tileSize = vec2(16, 32);
+    this.color = new Color(0.5, 0.5, 0.5);
+    this.tileIndex = 4;
+    this.renderOrder = 2;
   }
 }
