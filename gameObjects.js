@@ -1,11 +1,13 @@
 class Boat extends EngineObject {
   constructor(pos) {
-    super(pos, vec2(2, 3.91), 0);
+    super(pos, vec2(3, 3), 0);
+
     this.damping = 0.95;
     this.angleVelocity = 0;
     this.setCollision(1, 1, 1);
-    this.tileSize = vec2(23, 45);
+    this.tileSize = vec2(16, 16);
     this.renderOrder = 2;
+    this.oar = "left";
   }
   update() {
     const nextPos = this.pos.x + this.velocity.x;
@@ -34,10 +36,12 @@ class Boat extends EngineObject {
     if (keyWasPressed(37, 0)) {
       //left
       this.angleVelocity -= 0.01;
+
       if (energy > 0) {
         energy -= 0.5;
       }
       this.trail(50, 5);
+
       sound_siderow.play();
     }
     if (keyWasPressed(39, 0)) {
@@ -67,6 +71,37 @@ class Boat extends EngineObject {
         energy -= 1;
       }
     }
+  }
+
+  boatAnimations() {
+    if (keyIsDown(37, 0)) {
+      // left
+      this.tileIndex = 2;
+      this.oar = "right";
+    } else if (keyIsDown(39, 0)) {
+      // right
+      this.tileIndex = 0;
+      this.oar = "left";
+    } else if (keyIsDown(38, 0)) {
+      // up
+      if (this.oar == "left") {
+        this.tileIndex = 0;
+      } else {
+        this.tileIndex = 2;
+      }
+    } else {
+      if (this.oar == "left") {
+        this.tileIndex = 1;
+      } else {
+        this.tileIndex = 3;
+      }
+    }
+    // if (keyIsDown(37, 0) && keyIsDown(38, 0)) {
+    //   this.tilePos = vec2(2, 0);
+    // }
+    // if (keyIsDown(39, 0) && keyIsDown(38, 0)) {
+    //   this.tilePos = vec2(3, 0);
+    // }
   }
 
   calculateMoveSpeed() {
@@ -128,8 +163,8 @@ class Enemy extends EngineObject {
     this.setCollision(1, 1, 1);
     this.aim = -20;
     this.axis = axis;
-    this.tileSize = vec2(23, 45);
-    this.tileIndex = 0;
+    this.tileSize = vec2(16, 16);
+    this.tileIndex = 1;
     this.renderOrder = 2;
     this.active = active;
     this.home = home;
@@ -465,7 +500,8 @@ class SlowEnemy extends Enemy {
     super(pos);
     this.color = new Color(0.9, 0.9, 0.1);
     this.renderOrder = 2;
-    this.tileIndex = -1;
+    this.tileIndex = 2;
+    this.tileSize = vec2(32, 16);
     this.speed = 0.1;
     this.active = true;
     this.attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
@@ -482,7 +518,8 @@ class SlowEnemy extends Enemy {
         vec2(
           Math.sin(this.angle) * bulletSpeed,
           Math.cos(this.angle) * bulletSpeed
-        )
+        ),
+        this.angle
       );
       sound_shoot.play();
       bulletTime = new Date().getTime();
@@ -497,14 +534,17 @@ class SlowEnemy extends Enemy {
 ////////////////////////////////////////////////////////////////////////////////////////
 
 class Bullet extends EngineObject {
-  constructor(pos, velocity) {
+  constructor(pos, velocity, angle) {
     super(pos, vec2());
     this.color = new Color(1, 1, 0);
     this.velocity = velocity;
+    this.angle = angle;
     this.damping = 1;
     this.gravityScale = 0;
+    this.tileIndex = 4;
+    this.tileSize = vec2(16, 16);
     this.renderOrder = 100;
-    this.drawSize = vec2(0.5, 0.5);
+    this.drawSize = vec2(3, 3);
     this.range = 2;
     this.setCollision(1);
   }

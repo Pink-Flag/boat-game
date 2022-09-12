@@ -94,6 +94,7 @@ function gameUpdate() {
 
     slowEnemy.collideWithBoatDetection();
     boat.calculateMoveSpeed();
+    boat.boatAnimations();
     if (boost) {
       boost.boatCollectBoost();
     }
@@ -171,7 +172,7 @@ function gameUpdate() {
 
     dockSoul();
     collectSoul();
-    
+
     if (queue.length === 0) {
       queue.push(new SoulQueue(dockPos, new Color(1, 1, 1)));
     }
@@ -179,14 +180,12 @@ function gameUpdate() {
     if (queue.length < 3) {
       queue.push(new SoulQueue(vec2(79, 16), randomColour()));
     }
-    console.log(queue[0].angle, boat.angle);
 
     if (!soulAtDock) {
       queue[0].seekDock();
     }
 
     energyCheck();
-    boat.tileIndex = 0;
 
     energyBarColourCheck();
 
