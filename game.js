@@ -12,6 +12,9 @@ let boat,
   currentAliveTime = 0,
   obstacle,
   dock,
+  bank,
+  bank2,
+  bank3,
   energy = 100,
   port,
   shimmer,
@@ -70,6 +73,7 @@ function gameUpdate() {
     checkGameOver();
 
     boat ||= new Boat(vec2(10, levelSize.y / 2 - 6));
+
     boatPos = boat.pos;
     port ||= new Port(vec2(2, levelSize.y / 2));
     obstacle ||= new Obstacle(
@@ -94,6 +98,7 @@ function gameUpdate() {
 
     slowEnemy.collideWithBoatDetection();
     boat.calculateMoveSpeed();
+    boat.boatAnimations();
     if (boost) {
       boost.boatCollectBoost();
     }
@@ -122,7 +127,6 @@ function gameUpdate() {
     enemy2.collideWithBoatDetection();
     enemy3.collideWithBoatDetection();
 
-    obstacle.tileIndex = -1;
     obstacle.collideWithBoatDetection();
     boat.whirlpool(obstacle.pos);
 
@@ -164,29 +168,31 @@ function gameUpdate() {
         boat.trail(moveSpeed);
       }
     }
-
     if (isGameOver) {
       shimmer.emitRate = 0;
     }
 
     dockSoul();
     collectSoul();
-    
+
     if (queue.length === 0) {
-      queue.push(new SoulQueue(dockPos, new Color(1, 1, 1)));
+      queue.push(new SoulQueue(dockPos, new Color(0.89, 0.0, 0.0), 4));
     }
 
     if (queue.length < 3) {
       queue.push(new SoulQueue(vec2(79, 16), randomColour()));
     }
-    console.log(queue[0].angle, boat.angle);
 
     if (!soulAtDock) {
       queue[0].seekDock();
     }
 
+    if (queue[0].pos.x < -2) {
+      soulAtDock = false;
+      queue.shift().destroy();
+      createDock();
+    }
     energyCheck();
-    boat.tileIndex = 0;
 
     energyBarColourCheck();
 
@@ -204,7 +210,9 @@ function gameUpdatePost() {}
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameRender() {
-  drawRect(cameraPos, levelSize, new Color(0.31, 0.396, 0.651), 0, 0);
+  // drawRect(cameraPos, levelSize, new Color(0.31, 0.396, 0.651), 0, 0);  og
+  // drawRect(cameraPos, levelSize, new Color(0, 0.443, 0.531), 0, 0);
+  drawRect(cameraPos, levelSize, new Color(0.36, 0.411, 0.623), 0, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -230,13 +238,14 @@ function gameRenderPost() {
     drawRect(vec2(50 + energy / 12, 41), energybar, energyBarColour, 0, 0);
   }
   if (startGame) {
-    drawRect(
+    const leftBank = drawRect(
       vec2(0, levelSize.y / 2),
       vec2(4, 40),
       new Color(0.87, 0.72, 0.54),
       0,
       0
     );
+
     drawRect(
       vec2(74, levelSize.y / 2),
       vec2(4, 40),
