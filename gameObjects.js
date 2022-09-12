@@ -171,6 +171,9 @@ class Enemy extends EngineObject {
     if (slowEnemy) {
       if (this.pos.distance(boatPos) > 15) {
         attractObject(this, speed, boatPos, true);
+      } else {
+        let attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
+        this.angle = Math.atan2(attract.x, attract.y);
       }
     } else {
       attractObject(this, speed, boatPos, true);

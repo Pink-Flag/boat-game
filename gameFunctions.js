@@ -140,14 +140,29 @@ function introScreen() {
   );
 }
 function controllsScreen() {
-  drawTextScreen(
-    `- press left arrow + right arrow to row forward
-    
-     - press left arrow to turn left
+  boat ||= new Boat(vec2(10, 33.5));
+  boat.angle = 2.5;
+  boatPos = boat.pos;
+  introSoul ||= new SoulQueue(vec2(8, 23.5), new Color(1, 1, 1), 4.8);
+  introPort ||= new Port(vec2(12, 23.5));
+  introEnemy ||= new Enemy(vec2(12, 18.5));
+  introSlowEnemy ||= new SlowEnemy(vec2(16, 18.5));
+  introSlowEnemy.angle = 0;
+  introSlowEnemy.drawSize = vec2(2, 4);
+  boost ||= new Boost(vec2(14, 14));
 
-     - press right arrow to turn right
+  drawTextScreen(
+    `- press up arrow to row your boat forward
+    
+     - press left and right arrows to turn left and right
+
+     - Collect the soul and return it to the dock
+
+     - Avoid the enemies and obstacles
+
+     - Collect the boost to regain energy
     `,
-    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.3),
+    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.2),
     40,
     new Color(),
     6,

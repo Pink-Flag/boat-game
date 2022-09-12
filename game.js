@@ -13,6 +13,11 @@ let boat,
   obstacle,
   dock,
   bank,
+  soul,
+  introSoul,
+  introEnemy,
+  introSlowEnemy,
+  introPort,
   bank2,
   bank3,
   energy = 100,
@@ -22,6 +27,7 @@ let boat,
   score = 0,
   speed = 0.3,
   technicalArea,
+  introBoat,
   obstacleIsHome = false,
   enemy2IsHome = false,
   enemy3IsHome = false,
@@ -64,6 +70,13 @@ function gameUpdate() {
 
     if (secondScreen) {
       if (keyWasPressed(32, 0)) {
+        introEnemy.destroy();
+        introSlowEnemy.destroy();
+        console.log(introPort);
+        introPort.destroy();
+        boost.pos = vec2(100, 100);
+        introSoul.destroy();
+        console.log(introPort);
         startGame = true;
         sound_music.play();
       }
@@ -80,7 +93,7 @@ function gameUpdate() {
       vec2(20, -20),
       vec2(Math.random() * (50 - 20) + 15, Math.random() * (30 - 10) + 10)
     );
-    boost ||= new Boost(vec2(100, 100));
+
     slowEnemy ||= new SlowEnemy(vec2(60, 30));
     slowEnemyPos = slowEnemy.pos;
 
@@ -241,7 +254,7 @@ function gameRenderPost() {
     const leftBank = drawRect(
       vec2(0, levelSize.y / 2),
       vec2(4, 40),
-      new Color(0.87, 0.72, 0.54),
+      new Color(0.61, 0.47, 0.34),
       0,
       0
     );
@@ -249,7 +262,7 @@ function gameRenderPost() {
     drawRect(
       vec2(74, levelSize.y / 2),
       vec2(4, 40),
-      new Color(0.87, 0.72, 0.54),
+      new Color(0.61, 0.47, 0.34),
       0,
       0
     );
