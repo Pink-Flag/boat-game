@@ -110,22 +110,33 @@ function collectSoul() {
 
 function introScreen() {
   drawTextScreen(
-    `River of Woe`,
+    `River of Woe `,
     vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.2),
     100,
     new Color(),
     12
   );
   drawTextScreen(
+    `by Matthew Johnson & Kristina Petrova`,
+    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.32),
+    30,
+    new Color(),
+    6
+  );
+  drawTextScreen(
+    `art by Tom McGlynn`,
+    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.38),
+    30,
+    new Color(),
+    6
+  );
+
+  drawTextScreen(
     `You are Charon, the ferryman of Hades, who needs to carry the souls
 
-    of the newly deceased who had received the rites of burial across
-
-    the river Acheron that devides the world of the living from the
-    
-    world of the dead.
+    of the newly deceased across the river Acheron to the world of the dead.
     `,
-    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.4),
+    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.55),
     35,
     new Color(),
     6
@@ -133,7 +144,7 @@ function introScreen() {
 
   drawTextScreen(
     "press space to continue",
-    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.84),
+    vec2(overlayCanvas.width / 2, overlayCanvas.height * 0.8),
     30,
     new Color(),
     6

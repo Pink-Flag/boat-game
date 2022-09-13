@@ -72,11 +72,9 @@ function gameUpdate() {
       if (keyWasPressed(32, 0)) {
         introEnemy.destroy();
         introSlowEnemy.destroy();
-        console.log(introPort);
         introPort.destroy();
         boost.pos = vec2(100, 100);
         introSoul.destroy();
-        console.log(introPort);
         startGame = true;
         sound_music.play();
       }
