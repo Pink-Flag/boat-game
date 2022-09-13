@@ -966,7 +966,7 @@ const sound_music = new Music([
   [0, 0, 1, 2, 1, 2, 4, 3, 3, 3, 5, 3, 5, 6, 6, 6, 7],
   147,
   {
-    title: "New Song",
+    title: "River of Woe",
     instruments: ["Bass", "Long Trianle", "Short Sine", "Long Sine"],
     patterns: [
       "Pattern 0",
@@ -1082,7 +1082,7 @@ const sound_collect = new Music([
   [0],
   99,
   {
-    title: "Arp",
+    title: "Collect Arp",
     instruments: ["Instrument 0", "Instrument 1"],
     patterns: ["Pattern 0"],
   },
@@ -1101,7 +1101,7 @@ const sound_dock = new Music([
   [0],
   99,
   {
-    title: "Arp",
+    title: "Dock Arp",
     instruments: ["Instrument 0", "Instrument 1"],
     patterns: ["Pattern 0"],
   },
@@ -1121,7 +1121,7 @@ const sound_boost = new Music([
   [0],
   99,
   {
-    title: "Arp",
+    title: "Boost Arp",
     instruments: ["sine arp", "Sine 2"],
     patterns: ["Pattern 0"],
   },

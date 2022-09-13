@@ -209,7 +209,6 @@ function gameReset() {
   queue.push(new SoulQueue(dockPos, new Color(1, 1, 1), 4));
 
   if (cargo) {
-    // boat.color = new Color(0.6, 0.81, 0.5);
     isSoulInBoat = false;
     cargo = false;
     createDock();
@@ -271,6 +270,7 @@ function moveObject(obj, speed) {
   obj.velocity.x += Math.sin(obj.angle) * speed;
   obj.velocity.y += Math.cos(obj.angle) * speed;
 }
+
 function attractObject(obj, speed, goalPos, isEnemy = false) {
   let attract = vec2(goalPos.x - obj.pos.x, goalPos.y - obj.pos.y);
   let angleRad = Math.atan2(attract.x, attract.y);

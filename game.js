@@ -57,6 +57,8 @@ function gameInit() {
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
+  // display intro screens
+
   if (!startGame) {
     if (!secondScreen) {
       introScreen();
@@ -80,11 +82,14 @@ function gameUpdate() {
       }
     }
   } else {
+    // game update
+
     energyRegain();
     checkGameOver();
 
-    boat ||= new Boat(vec2(10, levelSize.y / 2 - 6));
+    // create instances of game objects
 
+    boat ||= new Boat(vec2(10, levelSize.y / 2 - 6));
     boatPos = boat.pos;
     port ||= new Port(vec2(2, levelSize.y / 2));
     obstacle ||= new Obstacle(
@@ -94,25 +99,6 @@ function gameUpdate() {
 
     slowEnemy ||= new SlowEnemy(vec2(60, 30));
     slowEnemyPos = slowEnemy.pos;
-
-    if (
-      (boat.getAliveTime() - currentAliveTime) % 30 === 0 &&
-      !isGameOver &&
-      boat.getAliveTime() - currentAliveTime > 10
-    ) {
-      showBoost();
-    }
-
-    if (!dock) {
-      createDock();
-    }
-
-    slowEnemy.collideWithBoatDetection();
-    boat.calculateMoveSpeed();
-    boat.boatAnimations();
-    if (boost) {
-      boost.boatCollectBoost();
-    }
 
     if (!enemy) {
       enemy = new Enemy(vec2(levelSize.x - 30, levelSize.y / 2 + 10), 0, true);
@@ -139,7 +125,32 @@ function gameUpdate() {
     enemy3.collideWithBoatDetection();
 
     obstacle.collideWithBoatDetection();
-    boat.whirlpool(obstacle.pos);
+    boat.pullTowardsWhirlpool(obstacle.pos);
+
+    // show boost at intervals
+
+    if (
+      (boat.getAliveTime() - currentAliveTime) % 30 === 0 &&
+      !isGameOver &&
+      boat.getAliveTime() - currentAliveTime > 10
+    ) {
+      showBoost();
+    }
+
+    if (!dock) {
+      createDock();
+    }
+
+    // game physics
+
+    slowEnemy.collideWithBoatDetection();
+    boat.calculateMoveSpeed();
+    boat.boatAnimations();
+    if (boost) {
+      boost.boatCollectBoost();
+    }
+
+    // enemy logic
 
     if (!isGameOver) {
       if (score >= 6) {
@@ -183,6 +194,8 @@ function gameUpdate() {
       shimmer.emitRate = 0;
     }
 
+    // soul queue logic
+
     dockSoul();
     collectSoul();
 
@@ -203,16 +216,21 @@ function gameUpdate() {
       queue.shift().destroy();
       createDock();
     }
+
+    if (isSoulInBoat) {
+      soulInBoat();
+    }
+    // energy bar logic
+
     energyCheck();
 
     energyBarColourCheck();
 
+    // reset game when game over
+
     if (isGameOver && keyWasPressed(32, 0)) {
       gameReset();
     }
-  }
-  if (isSoulInBoat) {
-    soulInBoat();
   }
 }
 
@@ -221,14 +239,14 @@ function gameUpdatePost() {}
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameRender() {
-  // drawRect(cameraPos, levelSize, new Color(0.31, 0.396, 0.651), 0, 0);  og
-  // drawRect(cameraPos, levelSize, new Color(0, 0.443, 0.531), 0, 0);
+  // render river
   drawRect(cameraPos, levelSize, new Color(0.36, 0.411, 0.623), 0, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameRenderPost() {
-  // draw to overlay canvas for hud rendering
+  // render HUD
+
   if (!isGameOver && startGame) {
     createShimmer();
     drawTextScreen(
@@ -248,6 +266,8 @@ function gameRenderPost() {
     let energybar = vec2(energy / 6, 1);
     drawRect(vec2(50 + energy / 12, 41), energybar, energyBarColour, 0, 0);
   }
+  //render banks
+
   if (startGame) {
     const leftBank = drawRect(
       vec2(0, levelSize.y / 2),

@@ -1,7 +1,6 @@
 class Boat extends EngineObject {
   constructor(pos) {
     super(pos, vec2(3, 3), 0);
-
     this.damping = 0.95;
     this.angleVelocity = 0;
     this.setCollision(1, 1, 1);
@@ -10,6 +9,8 @@ class Boat extends EngineObject {
     this.oar = "left";
   }
   update() {
+    //restrict boat movement inside camera view
+
     const nextPos = this.pos.x + this.velocity.x;
     if (
       nextPos - this.size.x / 2 < 1 ||
@@ -103,7 +104,7 @@ class Boat extends EngineObject {
       Math.round(Math.abs(this.velocity.x + this.velocity.y * 100) * 10) / 10;
   }
 
-  whirlpool(obstaclePos) {
+  pullTowardsWhirlpool(obstaclePos) {
     let distance = obstaclePos.distance(this.pos);
     let whirlSpeed = (11 - distance) / 1000;
     if (distance < 8) {
@@ -165,11 +166,14 @@ class Enemy extends EngineObject {
     this.isHome = false;
   }
   seekHome() {
+    //move enemy towards starting position
     attractObject(this, 0.001, this.home, true);
   }
   enemySeek(speed = calculateEnemySpeed(), slowEnemy = false) {
+    // logic to make enemy seek player
     if (slowEnemy) {
       if (this.pos.distance(boatPos) > 15) {
+        // stops slowEnemy from attempting to ram player
         attractObject(this, speed, boatPos, true);
       } else {
         let attract = vec2(boatPos.x - this.pos.x, boatPos.y - this.pos.y);
@@ -180,6 +184,7 @@ class Enemy extends EngineObject {
     }
   }
   enemyHoldX() {
+    // when player is out of range of enemy, this sets a holding pattern
     if (this.pos.x > 57) {
       this.aim = -65;
     }
@@ -207,6 +212,7 @@ class Enemy extends EngineObject {
   }
 
   moveEnemy() {
+    // checks distance of enemy to player and sets appropriate movement
     let distance = boatPos.distance(this.pos);
     if (Math.floor(this.getAliveTime()) % 2 == 0) {
       this.tileIndex = 8;
@@ -392,37 +398,10 @@ class Obstacle extends EngineObject {
   }
 
   seekHome() {
+    //moves obstacle to starting position
     attractObject(this, this.speed, vec2(this.home.x + 15, this.home.y));
   }
-  whirl() {
-    let emitter = new ParticleEmitter(
-      this.pos,
-      this.angle,
-      0,
-      1,
-      10,
-      0, // pos, angle, emitSize, emitTime, emitRate, emiteCone
-      -1,
-      vec2(16), // tileIndex, tileSize
-      new Color(1, 1, 1),
-      new Color(0, 0, 0), // colorStartA, colorStartB
-      new Color(1, 1, 1, 0),
-      new Color(0, 0, 0, 0), // colorEndA, colorEndB
-      2,
-      0.1,
-      0.1,
-      0.1,
-      0.05, // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
-      0.99,
-      1,
-      1,
-      PI,
-      0.05, // damping, angleDamping, gravityScale, particleCone, fadeRate,
-      0.5,
-      1 // randomness, collide, additive, randomColorLinear, renderOrder
-    );
-    emitter.trailScale = 1;
-  }
+
   collideWithBoatDetection() {
     if (isOverlapping(this.pos, vec2(2, 3), boatPos, vec2(1.6, 3))) {
       if (!isGameOver) {
@@ -433,6 +412,7 @@ class Obstacle extends EngineObject {
   }
   update() {
     if (!isGameOver) {
+      // stops obstacle spinning at game over
       this.angleVelocity = 0.2;
     } else {
       this.angleVelocity = 0;
@@ -474,6 +454,7 @@ class SoulQueue extends EngineObject {
     }
   }
   restrictMovement() {
+    // this stops the boat from getting stuck in an inifinte loop when a soul is onboard and you try to exit the screen
     const nextPos = this.pos.x + this.velocity.x;
     if (this.active) {
       if (
@@ -501,7 +482,6 @@ class SoulQueue extends EngineObject {
 class Port extends EngineObject {
   constructor(pos) {
     super(pos, vec2(2, 4), 0);
-    // this.color = new Color(0.9, 0.9, 0.1);
     this.renderOrder = 1;
     this.tileIndex = 4;
     this.tileSize = vec2(16, 32);
